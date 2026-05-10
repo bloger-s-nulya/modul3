@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Модуль 3. Урок 3 — Один пост — три площадки: без лишней работы</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#FFFFFF; --bg-soft:#F5F6F7; --bg-muted:#EDEEF0; --ink:#1A1A1A; --ink-2:#4A4D52; --ink-3:#8A8E94; --line:#E4E6E9; --accent:#C4F542; --accent-strong:#B8E83D; --accent-ink:#0F1A00; --font-display:'Unbounded',ui-sans-serif,system-ui,sans-serif; --font-body:'Manrope',ui-sans-serif,system-ui,sans-serif; --font-mono:'JetBrains Mono',ui-monospace,monospace; --radius-sm:10px; --radius-md:16px; --radius-lg:24px; --radius-pill:999px; --shadow-sm:0 1px 2px rgba(16,18,20,.04),0 1px 1px rgba(16,18,20,.03); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); color: var(--ink); background: var(--bg); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+  .hero { background: var(--bg-soft); border-bottom: 1px solid var(--line); padding: 56px 32px 48px; }
+  .hero-inner { max-width: 880px; margin: 0 auto; }
+  .eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 20px; display: block; }
+  .title-block { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start; margin-bottom: 24px; }
+  .stamp { display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; background: var(--accent); color: var(--accent-ink); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; margin-top: 10px; }
+  .title-text { font-family: var(--font-display); font-weight: 600; font-size: clamp(26px, 3.5vw, 38px); line-height: 1.15; letter-spacing: -0.02em; }
+  .hero-lead { font-size: 17px; font-weight: 500; line-height: 1.6; color: var(--ink-2); max-width: 620px; }
+  .meta-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-pill); font-size: 13px; font-weight: 500; color: var(--ink-2); }
+  .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3); flex-shrink: 0; }
+  .chip-dot.accent { background: var(--accent); }
+
+  .nav-bar { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 32px; }
+  .nav-inner { max-width: 880px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 2px; scrollbar-width: none; }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-btn { display: inline-flex; align-items: center; gap: 7px; padding: 12px 12px; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--ink-2); border: none; background: transparent; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: color .15s, border-color .15s, background .15s; border-radius: 8px 8px 0 0; }
+  .nav-btn:hover { color: var(--ink); background: var(--bg-muted); }
+  .nav-btn.active { color: var(--ink); border-bottom-color: var(--accent); background: transparent; }
+  .nav-num { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-ink); transition: background .15s, color .15s; }
+  .nav-btn.active .nav-num { background: var(--accent); color: var(--accent-ink); }
+
+  .page-wrap { max-width: 880px; margin: 0 auto; padding: 0 32px 100px; }
+  .section { padding-top: 60px; }
+  .section-alt { margin: 48px -32px 0; padding: 48px 32px 8px; background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .section-alt + .section { padding-top: 60px; }
+  @media (max-width: 640px) { .section-alt { margin: 48px -20px 0; padding: 40px 20px 8px; } }
+  .section-label { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; margin-bottom: 6px; }
+  .section-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--ink-3); flex-shrink: 0; letter-spacing: 0; }
+  .section-title { font-family: var(--font-display); font-weight: 500; font-size: 26px; letter-spacing: -0.01em; margin-bottom: 4px; line-height: 1.2; }
+  .section-title-hl { background-image: linear-gradient(transparent 52%, var(--accent) 52%, var(--accent) 94%, transparent 94%); padding: 0 3px; }
+  .section-hr { height: 1px; background: var(--line); border: none; margin: 20px 0 28px; }
+
+  .card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px 28px; box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+  .card-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 12px; }
+  .card h3 { font-family: var(--font-body); font-weight: 700; font-size: 18px; margin-bottom: 10px; line-height: 1.3; }
+  .card p, .card li { color: var(--ink-2); font-size: 15px; line-height: 1.65; }
+
+  .key-point { display: flex; gap: 16px; background: var(--bg-soft); border-radius: var(--radius-md); padding: 18px 22px; border-left: 3px solid var(--accent); margin-bottom: 16px; }
+  .key-point-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; padding-top: 3px; flex-shrink: 0; }
+  .key-point p { margin: 0; font-weight: 600; font-size: 15px; line-height: 1.55; color: var(--ink); }
+
+  .formula { background: var(--ink); color: #fff; border-radius: var(--radius-md); padding: 20px 24px; margin-bottom: 16px; }
+  .formula-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A8E94; margin-bottom: 10px; }
+  .formula-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+  .formula-step { background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 8px; white-space: nowrap; }
+  .formula-arrow { color: var(--accent); font-family: var(--font-mono); font-size: 16px; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .compare-card { border-radius: var(--radius-md); padding: 20px; font-size: 14px; line-height: 1.6; }
+  .compare-bad { background: #FFF5F5; border: 1px solid #FCCACA; }
+  .compare-good { background: #F5FEE0; border: 1px solid #D4F097; }
+  .compare-header { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; font-weight: 600; }
+  .compare-bad .compare-header { color: #C03030; }
+  .compare-good .compare-header { color: #4A8000; }
+  .compare-card p { color: #444; margin-bottom: 8px; }
+  .compare-card p:last-child { margin-bottom: 0; }
+
+  .headlines-list { list-style: none; display: grid; gap: 8px; margin-bottom: 16px; }
+  .headlines-list li { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: var(--bg-soft); border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; color: var(--ink); border: 1px solid var(--line); }
+  .headlines-list li::before { content: '—'; font-family: var(--font-mono); color: var(--accent-strong); font-weight: 700; flex-shrink: 0; }
+
+  .steps-list { list-style: none; counter-reset: step; display: grid; gap: 0; }
+  .steps-list li { counter-increment: step; display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); align-items: start; }
+  .steps-list li:last-child { border-bottom: none; }
+  .steps-list li::before { content: counter(step, decimal-leading-zero); font-family: var(--font-mono); font-size: 12px; font-weight: 500; color: var(--ink-3); padding-top: 2px; }
+  .step-title { font-weight: 700; font-size: 15px; margin-bottom: 3px; }
+  .step-desc { font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+
+  .callout-warn { background: #FFFBEB; border: 1px solid #F0D080; border-left: 3px solid #E0A000; border-radius: var(--radius-md); padding: 16px 20px; font-size: 14px; color: #5A4500; margin-bottom: 16px; line-height: 1.6; }
+  .callout-warn strong { color: #3A2E00; }
+
+  .secrets-grid { display: grid; gap: 12px; }
+  .secret-item { display: grid; grid-template-columns: 36px 1fr; gap: 14px; padding: 16px 20px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius-md); align-items: start; }
+  .secret-num { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--accent-ink); background: var(--accent); border-radius: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .secret-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .secret-desc { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+
+  .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .service-card { padding: 18px 20px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-md); }
+  .service-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .service-tag { display: inline-block; padding: 3px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; margin-bottom: 10px; font-family: var(--font-mono); }
+  .tag-free { background: #E8F8D0; color: #3A6000; }
+  .tag-paid { background: #FFF0D0; color: #7A4000; }
+  .tag-freemium { background: #EEF0FF; color: #3A3080; }
+  .service-desc { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+
+  .checklist-group { margin-bottom: 24px; }
+  .checklist-group-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; }
+  .checklist-items { list-style: none; display: grid; gap: 8px; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-md); cursor: pointer; transition: background .12s; }
+  .checklist-item:hover { background: var(--bg-soft); }
+  .checklist-item.checked { background: #F5FEE0; border-color: #C8F090; }
+  .check-box { flex-shrink: 0; width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--ink-3); margin-top: 1px; position: relative; transition: background .12s, border-color .12s; }
+  .checklist-item.checked .check-box { background: var(--accent); border-color: var(--accent); }
+  .checklist-item.checked .check-box::after { content: ''; position: absolute; left: 5px; top: 1px; width: 6px; height: 10px; border-right: 2px solid var(--accent-ink); border-bottom: 2px solid var(--accent-ink); transform: rotate(45deg); }
+  .check-text { font-size: 14px; font-weight: 500; line-height: 1.5; color: var(--ink); }
+  .checklist-item.checked .check-text { color: var(--ink-2); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+  .checklist-progress { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .progress-bar-wrap { flex: 1; height: 6px; background: var(--bg-muted); border-radius: var(--radius-pill); overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--accent); border-radius: var(--radius-pill); transition: width .3s ease; width: 0%; }
+  .progress-label { font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+
+  .task-dark { background: var(--ink); color: #fff; border-radius: var(--radius-lg); padding: 32px; margin-top: 24px; }
+  .task-dark h3 { font-family: var(--font-display); font-weight: 500; font-size: 22px; margin-bottom: 16px; letter-spacing: -0.01em; }
+  .task-dark p { color: #CCC; font-size: 15px; line-height: 1.65; margin-bottom: 12px; }
+  .task-dark p:last-of-type { margin-bottom: 20px; }
+  .task-steps { list-style: none; display: grid; gap: 10px; margin-bottom: 24px; }
+  .task-steps li { display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: #CCC; line-height: 1.55; }
+  .task-step-num { font-family: var(--font-mono); font-size: 11px; color: var(--accent); font-weight: 600; flex-shrink: 0; padding-top: 2px; }
+  .btn-accent { display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; background: var(--accent); color: var(--accent-ink); font-family: var(--font-body); font-weight: 700; font-size: 14px; border-radius: var(--radius-pill); border: none; cursor: pointer; text-decoration: none; transition: background .15s; }
+  .btn-accent:hover { background: var(--accent-strong); }
+
+  .hl { background: var(--accent); color: var(--accent-ink); padding: 1px 7px; border-radius: 5px; font-weight: 600; }
+  .hl-line { display: inline; background-image: linear-gradient(transparent 55%, var(--accent) 55%, var(--accent) 92%, transparent 92%); padding: 0 2px; font-weight: 600; }
+
+  .glossary { display: grid; gap: 10px; }
+  .glossary-item { padding: 16px 20px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius-md); }
+  .glossary-term { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: var(--ink); }
+  .glossary-def { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+
+  .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0; color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .stat-card { padding: 18px 20px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-md); }
+  .stat-num { font-family: var(--font-display); font-size: 28px; font-weight: 600; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--ink); }
+  .stat-label { font-size: 13px; color: var(--ink-2); line-height: 1.4; }
+
+  .footnote { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.55; color: var(--ink-3); font-family: var(--font-body); }
+  .footnote p { margin: 0; }
+  .footnote-mark { color: var(--ink-2); font-weight: 700; margin-right: 4px; }
+
+  .section-alt .card,
+  .section-alt .service-card,
+  .section-alt .stat-card { background: var(--bg); }
+  .section-alt .secret-item { background: var(--bg); }
+  .section-alt .glossary-item { background: var(--bg); }
+  .section-alt .checklist-item { background: var(--bg); }
+
+  .service-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; font-size: 12px; font-weight: 600; font-family: var(--font-mono); color: var(--ink-2); text-decoration: none; border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 4px 11px; transition: border-color .15s, color .15s; }
+  .service-link:hover { border-color: var(--ink); color: var(--ink); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 36px 20px 32px; }
+    .page-wrap { padding: 0 20px 80px; }
+    .nav-bar { padding: 0 20px; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .title-block { grid-template-columns: 1fr; gap: 12px; }
+    .stamp { margin-top: 0; }
+    .formula-steps { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Fitstars · Блогер с нуля</span>
+    <div class="title-block">
+      <span class="stamp">Модуль 3 / Урок 3</span>
+      <span class="title-text">Один пост — три площадки: без лишней работы</span>
+    </div>
+    <p class="hero-lead">Не уникальный контент в каждой соцсети, а одно ядро с быстрой адаптацией. Так блог растёт сразу везде — и автор не выгорает за месяц.</p>
+    <div class="meta-chips">
+      <span class="chip"><span class="chip-dot accent"></span>Дарья Яковлева — Блогер @daryasemm</span>
+      <span class="chip"><span class="chip-dot"></span>Схема «3 кита»</span>
+      <span class="chip"><span class="chip-dot"></span>5 площадок одновременно</span>
+      <span class="chip"><span class="chip-dot"></span>Делегирование как защита</span>
+    </div>
+  </div>
+</header>
+
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="navTo('intro')"><span class="nav-num">1</span> Зачем мультиканал</button>
+    <button class="nav-btn" onclick="navTo('system')"><span class="nav-num">2</span> Схема Дарьи</button>
+    <button class="nav-btn" onclick="navTo('platforms')"><span class="nav-num">3</span> Адаптация</button>
+    <button class="nav-btn" onclick="navTo('burn')"><span class="nav-num">4</span> Не выгореть</button>
+    <button class="nav-btn" onclick="navTo('checklist')"><span class="nav-num">5</span> Чек-лист</button>
+    <button class="nav-btn" onclick="navTo('glossary')"><span class="nav-num">6</span> Глоссарий</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- СЕКЦИЯ 01: ЗАЧЕМ МУЛЬТИКАНАЛ -->
+  <section class="section" id="intro">
+    <div class="section-label"><span class="section-num">01</span>Зачем мультиканал</div>
+    <h2 class="section-title"><span class="section-title-hl">Одна соцсеть — это слишком тонкий лёд</span></h2>
+    <hr class="section-hr">
+
+    <div class="key-point">
+      <div class="key-point-label">Главное</div>
+      <p>Не нужен разный контент в каждой соцсети. Аудитория во всех соцсетях разная — и у каждого человека свой «дом», в котором он сидит. Один и тот же материал в разных местах закроет разные сегменты.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Личный путь Дарьи</div>
+      <h3>8 лет ведения блога — от деревни до мультиплатформы</h3>
+      <p>Дарья начинала 8 лет назад в Instagram* — рассказывала про фермерское хозяйство: курочек, козочек, деревенскую жизнь. Тогда в ленте были моря и красивая еда, а она зашла на контрасте — и быстро нашла свою аудиторию.</p>
+      <p style="margin-top: 8px;">Сейчас она ведёт <span class="hl-line">пять площадок одновременно</span>: ВКонтакте, Instagram*, YouTube, Дзен, Telegram. Стабильный рост, налаженная монетизация, без гонки за охватами.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Почему одной соцсети мало</div>
+      <h3>Подстраховка на завтра</h3>
+      <p>На сегодняшний день одной площадки мало для уверенного завтрашнего дня. Если одна вдруг отключится — переходим на другую и продолжаем работать. Это не паника, это здравый смысл.</p>
+    </div>
+
+    <div class="callout-warn">
+      <strong>Главная ошибка, которая чуть не убила блог Дарьи.</strong> Сначала Дарья пыталась делать <strong>уникальный контент</strong> для каждой из пяти соцсетей. Получила выгорание, депрессию, усталость, стресс, хаос. И — самое дурацкое — момент, когда захотелось вообще ничего не делать. Поэтому правило: <span class="hl-line">не бойтесь одинакового контента</span>.
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Формула устойчивого мультиканала</div>
+      <div class="formula-steps">
+        <span class="formula-step">Ядро контента</span>
+        <span class="formula-arrow">→</span>
+        <span class="formula-step">Адаптация</span>
+        <span class="formula-arrow">→</span>
+        <span class="formula-step">Дублирование</span>
+        <span class="formula-arrow">→</span>
+        <span class="formula-step" style="background: rgba(196,245,66,0.2); color: var(--accent);">5 площадок без выгорания</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 02: СХЕМА АРИИ -->
+  <section class="section" id="system">
+    <div class="section-label"><span class="section-num">02</span>Схема Дарьи</div>
+    <h2 class="section-title"><span class="section-title-hl">Три кита — текст, сторис, видео — закрывают пять площадок</span></h2>
+    <hr class="section-hr">
+
+    <div class="key-point" style="margin-bottom: 24px;">
+      <div class="key-point-label">Принцип</div>
+      <p>Создаём не «контент для Instagram*», «контент для ВК», «контент для Дзена», а три типа материала. Каждый расходится сразу в несколько мест — без двойной работы.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Кит 01 · Тексты</div>
+      <h3>Один текст — Telegram + ВК + Дзен</h3>
+      <p>Дарья пишет один текстовый пост — и он уходит в три места. Telegram — простая упаковка: фото + быстрый текст. ВК — тот же текст с чуть более ярким заголовком, чтобы достать чужую аудиторию. Дзен — то же ядро, но с расчётом на длинное чтение.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Кит 02 · Сторис</div>
+      <h3>Снятые сторис — Instagram* + ВК</h3>
+      <p>Снимаются один раз — выкладываются в два места. ВК-сторис набирают хорошие охваты, и игнорировать эту площадку — терять без причины. Просто берём готовое из Instagram* и дублируем.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Кит 03 · Видео</div>
+      <h3>Из тех же сторис — Reels + Shorts + клипы ВК</h3>
+      <p>Из снятого сторис-материала собираются короткие видео. Они уходят сразу в три места: Reels (Instagram*), Shorts (YouTube), клипы (ВКонтакте). Один монтаж — три публикации.</p>
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Состав минимального дня</div>
+      <div class="formula-steps">
+        <span class="formula-step">1 текст</span>
+        <span class="formula-arrow">+</span>
+        <span class="formula-step">сторис</span>
+        <span class="formula-arrow">+</span>
+        <span class="formula-step">1 видео</span>
+        <span class="formula-arrow">→</span>
+        <span class="formula-step" style="background: rgba(196,245,66,0.2); color: var(--accent);">9–10 публикаций на 5 площадках</span>
+      </div>
+    </div>
+
+    <div class="callout-warn">
+      <strong>Не бойтесь, что подписчики увидят одно и то же.</strong> Подавляющее большинство людей сидит в одной-двух соцсетях, остальные не открывает. Те, кто увидит дубль на двух площадках, — лояльная аудитория, и её это не оттолкнёт.
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 03: АДАПТАЦИЯ -->
+  <section class="section section-alt" id="platforms">
+    <div class="section-label"><span class="section-num">03</span>Адаптация</div>
+    <h2 class="section-title"><span class="section-title-hl">Особенности площадок: что и как там работает</span></h2>
+    <hr class="section-hr">
+
+    <p style="color: var(--ink-2); font-size: 15px; line-height: 1.65; margin-bottom: 24px;">Контент один — но упаковка разная. Учитываем, что любит каждая площадка, и адаптируем под её формат. Ничего сверхсложного: меняется заголовок, длина, иногда обложка.</p>
+
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-name">Instagram*</div>
+        <span class="service-tag tag-paid">Серая зона</span>
+        <div class="service-desc">Главный двигатель — Reels. Сторис идут сюда полным потоком. Посты-карусели работают, но слабее коротких видео. Здесь живёт та аудитория, которая «выбрала визуальный канал».</div>
+        <a class="service-link" href="https://instagram.com" target="_blank">↗ instagram.com</a>
+      </div>
+      <div class="service-card">
+        <div class="service-name">YouTube</div>
+        <span class="service-tag tag-paid">Серая зона</span>
+        <div class="service-desc">Shorts — то же видео, что Reels, без правок. Длинные горизонтальные ролики — для глубокого разбора, отдельный жанр. Подписчик сюда приходит за основательностью.</div>
+        <a class="service-link" href="https://youtube.com" target="_blank">↗ youtube.com</a>
+      </div>
+      <div class="service-card">
+        <div class="service-name">Telegram</div>
+        <span class="service-tag tag-free">Легально</span>
+        <div class="service-desc">Любит открытость, честность, ощущение «уютного пространства» и «здороваемся за руку». Текст быстрый, без шапок и лишнего. Фото + 2–3 абзаца — норма.</div>
+        <a class="service-link" href="https://telegram.org" target="_blank">↗ telegram.org</a>
+      </div>
+      <div class="service-card">
+        <div class="service-name">ВКонтакте</div>
+        <span class="service-tag tag-free">Легально</span>
+        <div class="service-desc">У Дарьи работают именно текстовые посты с фото — как раньше в Instagram*. Клипы и длинные влоги у неё не зашли. Заголовок — чуть ярче, чтобы достать не-подписчиков.</div>
+        <a class="service-link" href="https://vk.com" target="_blank">↗ vk.com</a>
+      </div>
+      <div class="service-card">
+        <div class="service-name">Яндекс.Дзен</div>
+        <span class="service-tag tag-free">Легально</span>
+        <div class="service-desc">Длинные тексты, экспертный разбор. То, что в Telegram уйдёт коротким сообщением, здесь становится статьёй на 1500–3000 знаков.</div>
+        <a class="service-link" href="https://dzen.ru" target="_blank">↗ dzen.ru</a>
+      </div>
+      <div class="service-card">
+        <div class="service-name">Логика адаптации</div>
+        <span class="service-tag tag-free">Принцип</span>
+        <div class="service-desc">Меняется не суть, а форма: длина текста, заголовок, наличие шапки/обложки. Само ядро — мысль, история, факты — остаётся тем же.</div>
+      </div>
+    </div>
+
+    <div class="divider">Как пишем — пример одной мысли в трёх форматах</div>
+
+    <div class="card">
+      <div class="card-label">Пример адаптации одного материала</div>
+      <ul class="steps-list">
+        <li>
+          <div>
+            <div class="step-title">Telegram — короткий текст + фото</div>
+            <div class="step-desc">«Сегодня поняла: чистить хлев самой — невыгодно. И по здоровью, и по деньгам. Делегирую — а сама работаю над контентом. Что не так?» + фото фермы. 2–3 абзаца, без шапки.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">ВКонтакте — пост с заголовком</div>
+            <div class="step-desc">«Зачем фермер платит другому за чистку хлева — личная история». То же ядро, но шапка резче, чтобы зацепить чужую аудиторию. 4–5 абзацев с примерами.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Дзен — статья на 1500 знаков</div>
+            <div class="step-desc">Тот же материал, но развёрнут до полноценного разбора: с подзаголовками, расчётами по времени, личными выводами. Аудитория Дзена приходит за глубиной — даём её.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Reels / Shorts / клип — 30-секундное видео</div>
+            <div class="step-desc">Главная мысль за 30 секунд: «Раньше чистила сама — теряла время и деньги. Считаю выгоду. Делегирую. Сторис — мой реальный день». Один монтаж — три публикации.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-card compare-bad">
+        <div class="compare-header">Слабый подход</div>
+        <p><strong>«Уникальный контент в каждую соцсеть»</strong></p>
+        <p>5 разных текстов, 5 разных видео, 5 разных стратегий. Через месяц — выгорание, через два — желание всё бросить. Дарья это уже проходила.</p>
+      </div>
+      <div class="compare-card compare-good">
+        <div class="compare-header">Сильный подход</div>
+        <p><strong>«Ядро + 5 адаптаций»</strong></p>
+        <p>Один материал на основе одной мысли. Меняется упаковка под площадку. Те же 9–10 публикаций — но без двойной работы и без ненависти к контенту через две недели.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 04: НЕ ВЫГОРЕТЬ -->
+  <section class="section" id="burn">
+    <div class="section-label"><span class="section-num">04</span>Не выгореть</div>
+    <h2 class="section-title"><span class="section-title-hl">Как держать темп пять лет, а не пять месяцев</span></h2>
+    <hr class="section-hr">
+
+    <div class="key-point" style="margin-bottom: 24px;">
+      <div class="key-point-label">Главное</div>
+      <p>Если делаете контент через силу — это видно. Аудитория не дура, она чувствует. Искренний, улыбающийся блогер с энергией приходит чаще, чем «ради статистики».</p>
+    </div>
+
+    <div class="secrets-grid">
+      <div class="secret-item">
+        <div class="secret-num">01</div>
+        <div>
+          <div class="secret-title">Не делать через силу</div>
+          <div class="secret-desc">Раньше Дарья думала: «Сегодня обязательно столько-то сторис и видео». Сейчас — если устала, уходит на пару дней отдохнуть и возвращается с новыми силами. Это выгоднее всем: и автору, и аудитории.</div>
+        </div>
+      </div>
+      <div class="secret-item">
+        <div class="secret-num">02</div>
+        <div>
+          <div class="secret-title">Не смотреть на охваты</div>
+          <div class="secret-desc">Охваты падают по тысяче причин — выходные, блокировки, сбои. Раньше Дарья реагировала. Сейчас нет. Намного важнее — лояльность и вовлечение, а не цифра.</div>
+        </div>
+      </div>
+      <div class="secret-item">
+        <div class="secret-num">03</div>
+        <div>
+          <div class="secret-title">Делегировать максимум</div>
+          <div class="secret-desc">Тексты, монтаж рилсов, съёмку, копирование контента из соцсети в соцсеть — всё, что можете отдать, отдавайте. Менеджер для дублирования контента — самое простое и самое полезное вложение.</div>
+        </div>
+      </div>
+      <div class="secret-item">
+        <div class="secret-num">04</div>
+        <div>
+          <div class="secret-title">Дружить с блогерами, а не конкурировать</div>
+          <div class="secret-desc">Блогеры одного уровня — ваше комьюнити, не конкуренты. Чаты, обмен наработками, поддержка в провалах охватов. Это и рост, и страховка от «у меня одной всё рушится».</div>
+        </div>
+      </div>
+      <div class="secret-item">
+        <div class="secret-num">05</div>
+        <div>
+          <div class="secret-title">Не бояться меняться</div>
+          <div class="secret-desc">Аудитория ждёт «прежнего» формата. Но если вы выросли — блог должен расти с вами. Уйдут одни, придут другие. Пример Дарьи: фермер, который перестал чистить хлев сам — потерял часть «старых», получил «новых», которым интересно про делегирование на ферме.</div>
+        </div>
+      </div>
+      <div class="secret-item">
+        <div class="secret-num">06</div>
+        <div>
+          <div class="secret-title">Монетизация через долгосрочные партнёрства</div>
+          <div class="secret-desc">Разовая реклама — дёшево и непредсказуемо. Долгосрочные партнёрства — стабильность: ТЗ зазубрено, время записи минимальное, лояльность аудитории растёт от регулярного присутствия одного бренда.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout-warn">
+      <strong>Главное правило роста.</strong> Если вам нравится то, что вы делаете, и вы с горящими глазами рассказываете это аудитории — им зайдёт. Это правило работает и наоборот: если вам не нравится — рано или поздно станет неинтересно и зрителям.
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 05: ЧЕК-ЛИСТ -->
+  <section class="section section-alt" id="checklist">
+    <div class="section-label"><span class="section-num">05</span>Чек-лист</div>
+    <h2 class="section-title"><span class="section-title-hl">Чек-лист настройки мультиканала</span></h2>
+    <hr class="section-hr">
+
+    <div class="checklist-progress">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <span class="progress-label" id="progress-label">0 / 12</span>
+    </div>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">Стратегия</div>
+      <ul class="checklist-items" id="checklist-items">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">У меня выбрано минимум 2 площадки — не зависну, если одна отключится</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я не делаю уникальный контент в каждую — у меня есть «ядро» и адаптации</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я знаю, что любит каждая моя площадка (формат, длина текста, тип видео)</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я не боюсь дублирования — понимаю, что аудитория в каждой соцсети разная</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">Производственный цикл</div>
+      <ul class="checklist-items">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Один текст превращается в 2–3 поста на разных площадках</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Сторис снимаются один раз и дублируются в Instagram* + ВК</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Из сторис я монтирую короткие видео для Reels / Shorts / клипов</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я делегирую то, что можно (копирование, монтаж, тексты)</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">Защита от выгорания</div>
+      <ul class="checklist-items">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я не делаю контент через силу — устала = пауза, не «через не могу»</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я перестала привязывать настроение к падениям охватов</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">У меня есть комьюнити блогеров своего уровня — обмен наработками и поддержка</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я разрешаю себе меняться — даже если часть аудитории недовольна</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 06: ГЛОССАРИЙ -->
+  <section class="section section-alt" id="glossary">
+    <div class="section-label"><span class="section-num">06</span>Глоссарий</div>
+    <h2 class="section-title"><span class="section-title-hl">Глоссарий урока</span></h2>
+    <hr class="section-hr">
+
+    <div class="glossary">
+      <div class="glossary-item">
+        <div class="glossary-term">Мультиканальность</div>
+        <div class="glossary-def">Стратегия одновременного присутствия в нескольких соцсетях. На сегодняшний день — норма, а не «продвинутая практика»: одна площадка = слишком тонкий лёд.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Ядро контента</div>
+        <div class="glossary-def">Одна мысль, история или материал, из которой собираются все публикации дня. Меняется только упаковка (длина, заголовок, формат), сама суть остаётся неизменной.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Адаптация под площадку</div>
+        <div class="glossary-def">Переупаковка одного материала под формат и ритм каждой соцсети: короткий текст в Telegram → расширенный с шапкой в ВК → статья в Дзене → 30-секундное видео в Reels. Не «уникальный контент», а адаптация.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Три кита Дарьи</div>
+        <div class="glossary-def">Три типа создаваемого контента, которые закрывают всю мультиканальную систему: текст (Telegram + ВК + Дзен), сторис (Instagram* + ВК), видео (Reels + Shorts + клипы). Один цикл — все площадки.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Делегирование</div>
+        <div class="glossary-def">Передача рутинных задач: копирование контента, монтаж, написание текстов, съёмка. Главная защита от выгорания при работе с несколькими площадками.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Долгосрочное партнёрство</div>
+        <div class="glossary-def">Способ монетизации, при котором блогер работает с одним рекламодателем регулярно, а не «разово». Плюсы: ТЗ заучено, на запись уходит мало времени, лояльность аудитории растёт от стабильного присутствия бренда.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Блогерское комьюнити</div>
+        <div class="glossary-def">Чаты и круги общения с блогерами своего уровня. Обмен фишками, поддержка в провалах охватов, защита от ощущения «у меня одной всё рухнуло». Не конкуренция, а взаимопомощь.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Меняться вместе с блогом</div>
+        <div class="glossary-def">Принцип: блог растёт вместе с автором, и старые форматы могут уйти. Часть аудитории не примет — нормально. Придёт новая, которой интересен текущий вы. Подстраиваться под старое = тормозить.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ЗАДАНИЕ -->
+  <section class="section section-alt" id="task">
+    <div class="task-dark">
+      <h3>Практическое задание</h3>
+      <p>Возьмите одно ядро и адаптируйте его прямо сегодня. Не теорию — практику: чтобы понять, насколько это реально быстро.</p>
+      <ul class="task-steps">
+        <li>
+          <span class="task-step-num">01</span>
+          <span>Выберите <strong style="color:#fff;">одну мысль</strong> или историю — ту, которую и так хотели рассказать на этой неделе.</span>
+        </li>
+        <li>
+          <span class="task-step-num">02</span>
+          <span>Адаптируйте её под <strong style="color:#fff;">три формата</strong>: короткий текст для Telegram (2–3 абзаца), пост с заголовком для ВК (4–5 абзацев), 30-секундное видео для Reels / Shorts / клипа.</span>
+        </li>
+        <li>
+          <span class="task-step-num">03</span>
+          <span>Опубликуйте <strong style="color:#fff;">всё в один день</strong>. Засеките, сколько реально занял весь цикл от написания до выкладки.</span>
+        </li>
+        <li>
+          <span class="task-step-num">04</span>
+          <span>Через неделю сравните: <strong style="color:#fff;">где какая реакция</strong>. Это даст вам понимание, какие площадки и форматы под вашу нишу работают сильнее.</span>
+        </li>
+      </ul>
+      <a class="btn-accent" onclick="navTo('checklist')" style="cursor:pointer;">
+        Открыть чек-лист ↑
+      </a>
+    </div>
+  </section>
+
+  <!-- СНОСКА -->
+  <footer class="footnote">
+    <p><span class="footnote-mark">*</span> Instagram принадлежит компании Meta, признанной экстремистской и запрещённой на территории Российской Федерации.</p>
+  </footer>
+
+</div>
+
+<script>
+  function navTo(id) {
+    const el = document.getElementById(id);
+    if (el) { window.scrollTo({ top: el.offsetTop - 60, behavior: 'smooth' }); }
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const sections = ['intro','system','platforms','burn','checklist','glossary'];
+    const idx = sections.indexOf(id);
+    if (idx > -1) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  }
+  function toggleCheck(item) { item.classList.toggle('checked'); updateProgress(); }
+  function updateProgress() {
+    const all = document.querySelectorAll('.checklist-item');
+    const done = document.querySelectorAll('.checklist-item.checked');
+    const pct = all.length ? Math.round((done.length / all.length) * 100) : 0;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = done.length + ' / ' + all.length;
+  }
+  updateProgress();
+  window.addEventListener('scroll', () => {
+    const sections = ['intro','system','platforms','burn','checklist','glossary','task'];
+    const offset = 120;
+    let current = 0;
+    sections.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el && window.scrollY + offset >= el.offsetTop) current = i;
+    });
+    document.querySelectorAll('.nav-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === Math.min(current, 5));
+    });
+  });
+</script>
+
+</body>
+</html>

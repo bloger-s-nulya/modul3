@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Модуль 3. Урок 1 — Контент-система: рубрики, план и место для жизни</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#FFFFFF; --bg-soft:#F5F6F7; --bg-muted:#EDEEF0; --ink:#1A1A1A; --ink-2:#4A4D52; --ink-3:#8A8E94; --line:#E4E6E9; --accent:#C4F542; --accent-strong:#B8E83D; --accent-ink:#0F1A00; --font-display:'Unbounded',ui-sans-serif,system-ui,sans-serif; --font-body:'Manrope',ui-sans-serif,system-ui,sans-serif; --font-mono:'JetBrains Mono',ui-monospace,monospace; --radius-sm:10px; --radius-md:16px; --radius-lg:24px; --radius-pill:999px; --shadow-sm:0 1px 2px rgba(16,18,20,.04),0 1px 1px rgba(16,18,20,.03); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); color: var(--ink); background: var(--bg); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+
+  .hero { background: var(--bg-soft); border-bottom: 1px solid var(--line); padding: 56px 32px 48px; }
+  .hero-inner { max-width: 880px; margin: 0 auto; }
+  .eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 20px; display: block; }
+  .title-block { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start; margin-bottom: 24px; }
+  .stamp { display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; background: var(--accent); color: var(--accent-ink); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; margin-top: 10px; }
+  .title-text { font-family: var(--font-display); font-weight: 600; font-size: clamp(26px, 3.5vw, 38px); line-height: 1.15; letter-spacing: -0.02em; }
+  .hero-lead { font-size: 17px; font-weight: 500; line-height: 1.6; color: var(--ink-2); max-width: 620px; }
+  .meta-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-pill); font-size: 13px; font-weight: 500; color: var(--ink-2); }
+  .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3); flex-shrink: 0; }
+  .chip-dot.accent { background: var(--accent); }
+
+  .nav-bar { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 0 32px; }
+  .nav-inner { max-width: 880px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 2px; scrollbar-width: none; }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-btn { display: inline-flex; align-items: center; gap: 7px; padding: 12px 12px; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--ink-2); border: none; background: transparent; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: color .15s, border-color .15s, background .15s; border-radius: 8px 8px 0 0; }
+  .nav-btn:hover { color: var(--ink); background: var(--bg-muted); }
+  .nav-btn.active { color: var(--ink); border-bottom-color: var(--accent); background: transparent; }
+  .nav-num { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--accent-ink); transition: background .15s, color .15s; }
+  .nav-btn.active .nav-num { background: var(--accent); color: var(--accent-ink); }
+
+  .page-wrap { max-width: 880px; margin: 0 auto; padding: 0 32px 100px; }
+  .section { padding-top: 60px; }
+  .section-alt { margin: 48px -32px 0; padding: 48px 32px 8px; background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .section-alt + .section { padding-top: 60px; }
+  @media (max-width: 640px) { .section-alt { margin: 48px -20px 0; padding: 40px 20px 8px; } }
+  .section-label { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; margin-bottom: 6px; }
+  .section-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--ink-3); flex-shrink: 0; letter-spacing: 0; }
+  .section-title { font-family: var(--font-display); font-weight: 500; font-size: 26px; letter-spacing: -0.01em; margin-bottom: 4px; line-height: 1.2; }
+  .section-title-hl { background-image: linear-gradient(transparent 52%, var(--accent) 52%, var(--accent) 94%, transparent 94%); padding: 0 3px; }
+  .section-hr { height: 1px; background: var(--line); border: none; margin: 20px 0 28px; }
+
+  .card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px 28px; box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+  .card-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 12px; }
+  .card h3 { font-family: var(--font-body); font-weight: 700; font-size: 18px; margin-bottom: 10px; line-height: 1.3; }
+  .card p, .card li { color: var(--ink-2); font-size: 15px; line-height: 1.65; }
+
+  .key-point { display: flex; gap: 16px; background: var(--bg-soft); border-radius: var(--radius-md); padding: 18px 22px; border-left: 3px solid var(--accent); margin-bottom: 16px; }
+  .key-point-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; padding-top: 3px; flex-shrink: 0; }
+  .key-point p { margin: 0; font-weight: 600; font-size: 15px; line-height: 1.55; color: var(--ink); }
+
+  .formula { background: var(--ink); color: #fff; border-radius: var(--radius-md); padding: 20px 24px; margin-bottom: 16px; }
+  .formula-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #8A8E94; margin-bottom: 10px; }
+  .formula-steps { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+  .formula-step { background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 8px; white-space: nowrap; }
+  .formula-arrow { color: var(--accent); font-family: var(--font-mono); font-size: 16px; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .compare-card { border-radius: var(--radius-md); padding: 20px; font-size: 14px; line-height: 1.6; }
+  .compare-bad { background: #FFF5F5; border: 1px solid #FCCACA; }
+  .compare-good { background: #F5FEE0; border: 1px solid #D4F097; }
+  .compare-header { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; font-weight: 600; }
+  .compare-bad .compare-header { color: #C03030; }
+  .compare-good .compare-header { color: #4A8000; }
+  .compare-card p { color: #444; margin-bottom: 8px; }
+  .compare-card p:last-child { margin-bottom: 0; }
+
+  .headlines-list { list-style: none; display: grid; gap: 8px; margin-bottom: 16px; }
+  .headlines-list li { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: var(--bg-soft); border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; color: var(--ink); border: 1px solid var(--line); }
+  .headlines-list li::before { content: '—'; font-family: var(--font-mono); color: var(--accent-strong); font-weight: 700; flex-shrink: 0; }
+
+  .steps-list { list-style: none; counter-reset: step; display: grid; gap: 0; }
+  .steps-list li { counter-increment: step; display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); align-items: start; }
+  .steps-list li:last-child { border-bottom: none; }
+  .steps-list li::before { content: counter(step, decimal-leading-zero); font-family: var(--font-mono); font-size: 12px; font-weight: 500; color: var(--ink-3); padding-top: 2px; }
+  .step-title { font-weight: 700; font-size: 15px; margin-bottom: 3px; }
+  .step-desc { font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+
+  .callout-warn { background: #FFFBEB; border: 1px solid #F0D080; border-left: 3px solid #E0A000; border-radius: var(--radius-md); padding: 16px 20px; font-size: 14px; color: #5A4500; margin-bottom: 16px; line-height: 1.6; }
+  .callout-warn strong { color: #3A2E00; }
+
+  .secrets-grid { display: grid; gap: 12px; }
+  .secret-item { display: grid; grid-template-columns: 36px 1fr; gap: 14px; padding: 16px 20px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius-md); align-items: start; }
+  .secret-num { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--accent-ink); background: var(--accent); border-radius: 8px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .secret-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .secret-desc { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+
+  .services-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .service-card { padding: 18px 20px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-md); }
+  .service-name { font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .service-tag { display: inline-block; padding: 3px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600; margin-bottom: 10px; font-family: var(--font-mono); }
+  .tag-free { background: #E8F8D0; color: #3A6000; }
+  .tag-paid { background: #FFF0D0; color: #7A4000; }
+  .tag-freemium { background: #EEF0FF; color: #3A3080; }
+  .service-desc { font-size: 13px; color: var(--ink-2); line-height: 1.55; }
+
+  .checklist-group { margin-bottom: 24px; }
+  .checklist-group-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; }
+  .checklist-items { list-style: none; display: grid; gap: 8px; }
+  .checklist-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-md); cursor: pointer; transition: background .12s; }
+  .checklist-item:hover { background: var(--bg-soft); }
+  .checklist-item.checked { background: #F5FEE0; border-color: #C8F090; }
+  .check-box { flex-shrink: 0; width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--ink-3); margin-top: 1px; position: relative; transition: background .12s, border-color .12s; }
+  .checklist-item.checked .check-box { background: var(--accent); border-color: var(--accent); }
+  .checklist-item.checked .check-box::after { content: ''; position: absolute; left: 5px; top: 1px; width: 6px; height: 10px; border-right: 2px solid var(--accent-ink); border-bottom: 2px solid var(--accent-ink); transform: rotate(45deg); }
+  .check-text { font-size: 14px; font-weight: 500; line-height: 1.5; color: var(--ink); }
+  .checklist-item.checked .check-text { color: var(--ink-2); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+  .checklist-progress { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .progress-bar-wrap { flex: 1; height: 6px; background: var(--bg-muted); border-radius: var(--radius-pill); overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--accent); border-radius: var(--radius-pill); transition: width .3s ease; width: 0%; }
+  .progress-label { font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+
+  .task-dark { background: var(--ink); color: #fff; border-radius: var(--radius-lg); padding: 32px; margin-top: 24px; }
+  .task-dark h3 { font-family: var(--font-display); font-weight: 500; font-size: 22px; margin-bottom: 16px; letter-spacing: -0.01em; }
+  .task-dark p { color: #CCC; font-size: 15px; line-height: 1.65; margin-bottom: 12px; }
+  .task-dark p:last-of-type { margin-bottom: 20px; }
+  .task-steps { list-style: none; display: grid; gap: 10px; margin-bottom: 24px; }
+  .task-steps li { display: flex; gap: 12px; align-items: flex-start; font-size: 14px; color: #CCC; line-height: 1.55; }
+  .task-step-num { font-family: var(--font-mono); font-size: 11px; color: var(--accent); font-weight: 600; flex-shrink: 0; padding-top: 2px; }
+  .btn-accent { display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; background: var(--accent); color: var(--accent-ink); font-family: var(--font-body); font-weight: 700; font-size: 14px; border-radius: var(--radius-pill); border: none; cursor: pointer; text-decoration: none; transition: background .15s; }
+  .btn-accent:hover { background: var(--accent-strong); }
+
+  .hl { background: var(--accent); color: var(--accent-ink); padding: 1px 7px; border-radius: 5px; font-weight: 600; }
+  .hl-line { display: inline; background-image: linear-gradient(transparent 55%, var(--accent) 55%, var(--accent) 92%, transparent 92%); padding: 0 2px; font-weight: 600; }
+
+  .glossary { display: grid; gap: 10px; }
+  .glossary-item { padding: 16px 20px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius-md); }
+  .glossary-term { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: var(--ink); }
+  .glossary-def { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+
+  .divider { display: flex; align-items: center; gap: 14px; margin: 24px 0; color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .stat-card { padding: 18px 20px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-md); }
+  .stat-num { font-family: var(--font-display); font-size: 28px; font-weight: 600; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 6px; color: var(--ink); }
+  .stat-label { font-size: 13px; color: var(--ink-2); line-height: 1.4; }
+
+  .footnote { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.55; color: var(--ink-3); font-family: var(--font-body); }
+  .footnote p { margin: 0; }
+  .footnote-mark { color: var(--ink-2); font-weight: 700; margin-right: 4px; }
+
+  .section-alt .card,
+  .section-alt .service-card,
+  .section-alt .stat-card { background: var(--bg); }
+  .section-alt .secret-item { background: var(--bg); }
+  .section-alt .glossary-item { background: var(--bg); }
+  .section-alt .checklist-item { background: var(--bg); }
+
+  .service-link { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; font-size: 12px; font-weight: 600; font-family: var(--font-mono); color: var(--ink-2); text-decoration: none; border: 1px solid var(--line); border-radius: var(--radius-pill); padding: 4px 11px; transition: border-color .15s, color .15s; }
+  .service-link:hover { border-color: var(--ink); color: var(--ink); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 36px 20px 32px; }
+    .page-wrap { padding: 0 20px 80px; }
+    .nav-bar { padding: 0 20px; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .title-block { grid-template-columns: 1fr; gap: 12px; }
+    .stamp { margin-top: 0; }
+    .formula-steps { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">Fitstars · Блогер с нуля</span>
+    <div class="title-block">
+      <span class="stamp">Модуль 3 / Урок 1</span>
+      <span class="title-text">Контент-система: рубрики, план и место для жизни</span>
+    </div>
+    <p class="hero-lead">Контент-план — не тюрьма, а опора. Он держит блог на плаву, когда вдохновение пропало, и оставляет место для живых эмоций, когда их хочется выложить прямо сейчас.</p>
+    <div class="meta-chips">
+      <span class="chip"><span class="chip-dot accent"></span>Анастасия Дробот — Блогер @istor.ichka</span>
+      <span class="chip"><span class="chip-dot"></span>Карта 5 платформ</span>
+      <span class="chip"><span class="chip-dot"></span>Минимум — 4 раза в неделю</span>
+      <span class="chip"><span class="chip-dot"></span>Лайфхак на 10 секунд</span>
+    </div>
+  </div>
+</header>
+
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="navTo('intro')"><span class="nav-num">1</span> Главное</button>
+    <button class="nav-btn" onclick="navTo('risk')"><span class="nav-num">2</span> Что без плана</button>
+    <button class="nav-btn" onclick="navTo('platforms')"><span class="nav-num">3</span> 5 платформ</button>
+    <button class="nav-btn" onclick="navTo('rhythm')"><span class="nav-num">4</span> Частота и темп</button>
+    <button class="nav-btn" onclick="navTo('checklist')"><span class="nav-num">5</span> Чек-лист</button>
+    <button class="nav-btn" onclick="navTo('glossary')"><span class="nav-num">6</span> Глоссарий</button>
+  </div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- СЕКЦИЯ 01: ГЛАВНОЕ -->
+  <section class="section" id="intro">
+    <div class="section-label"><span class="section-num">01</span>Главное</div>
+    <h2 class="section-title"><span class="section-title-hl">Контент-план — это страховка от провалов вдохновения</span></h2>
+    <hr class="section-hr">
+
+    <div class="key-point">
+      <div class="key-point-label">Главное</div>
+      <p>Контент-план не запирает вас в расписании. Он даёт опору в те дни, когда идей нет, и не мешает выложить эмоцию прямо сейчас, когда она есть.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Что такое контент-план у Анастасии</div>
+      <h3>Заметка в телефоне + папка с готовыми рилс</h3>
+      <p>У спикера контент-план — простая <span class="hl-line">заметка в телефоне</span>: туда сваливаются все идеи, которые приходят неожиданно (иногда даже перед сном). К утру забудется — поэтому запись сразу. Когда нужна тема, заметка открывается — выбирается то, что ещё не делала.</p>
+      <p style="margin-top: 8px;">Вторая часть — <span class="hl-line">папка с готовыми рилс</span>, которые уже смонтированы, но ещё не выложены. На случай, когда нужно что-то опубликовать, а вдохновения нет.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Альтернативный вариант</div>
+      <h3>Жёсткий план с датами — тоже рабочий, но не для всех</h3>
+      <p>У некоторых блогеров контент-план расписан по датам: какой день — какая тема. Это рабочий формат для дисциплинированных людей. Анастасия так не делает: она часто отступает от плана, потому что хочет выйти в блог именно с теми эмоциями, которые есть прямо сейчас.</p>
+      <p style="margin-top: 8px;">Оба подхода работают. Главное — чтобы запас идей и материала был. Отступать можно всегда.</p>
+    </div>
+
+    <div class="formula">
+      <div class="formula-label">Логика контент-системы</div>
+      <div class="formula-steps">
+        <span class="formula-step">Заметка с идеями</span>
+        <span class="formula-arrow">+</span>
+        <span class="formula-step">Папка с заготовками</span>
+        <span class="formula-arrow">+</span>
+        <span class="formula-step">Место для живого</span>
+        <span class="formula-arrow">→</span>
+        <span class="formula-step" style="background: rgba(196,245,66,0.2); color: var(--accent);">регулярность</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 02: ЧТО БЕЗ ПЛАНА -->
+  <section class="section" id="risk">
+    <div class="section-label"><span class="section-num">02</span>Что без плана</div>
+    <h2 class="section-title"><span class="section-title-hl">Что происходит, когда вы перестаёте выкладывать</span></h2>
+    <hr class="section-hr">
+
+    <div class="key-point" style="margin-bottom: 24px;">
+      <div class="key-point-label">Принцип</div>
+      <p>Соцсети не любят, когда мы останавливаемся в постинге. Каждый пропущенный день — это сигнал алгоритму «автор ушёл», и охваты режутся.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num">100–150</div>
+        <div class="stat-label">человек ежедневно отписываются от любого активного блога — это естественный отток</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">2 раза</div>
+        <div class="stat-label">за полтора года Анастасия теряла подписчиков именно из-за пауз</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">4 раза в неделю</div>
+        <div class="stat-label">минимум публикаций, чтобы алгоритмы не «зарезали» страницу</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Личная история Анастасии</div>
+      <h3>Январские каникулы — и минус подписчики</h3>
+      <p>Дважды на январских каникулах Анастасия делала большую паузу в постинге — отдыхала. И каждый раз цифра подписчиков шла не вверх и даже не оставалась прежней — она <span class="hl-line">падала</span>.</p>
+      <p style="margin-top: 8px;">Причина: люди в каникулы и сами потребляют контент активнее, и параллельно чистят подписки от тех, кто перестал что-то выкладывать. Если профиль молчит — он первый кандидат на отписку.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Почему блог всё равно растёт</div>
+      <h3>Прирост должен перекрывать естественный отток</h3>
+      <p>Отписки 100–150 в день — это норма. Это не показатель того, что у вас «плохой блог». Просто часть людей теряет интерес, у части меняются интересы — это органика.</p>
+      <p style="margin-top: 8px;">Чтобы блог рос, прирост новых должен быть больше, чем отток. А прирост даёт <strong>регулярный контент</strong>. Поэтому без контент-плана даже хороший блог постепенно идёт вниз.</p>
+    </div>
+
+    <div class="callout-warn">
+      <strong>Что значит пропасть надолго.</strong> Пропасть на неделю — заметят. Пропасть на две — алгоритмы перестанут показывать страницу вашим же подписчикам. Пропасть на месяц — после возвращения охваты придётся «отращивать» снова. Маленькие публикации лучше, чем тишина.
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 03: 5 ПЛАТФОРМ -->
+  <section class="section section-alt" id="platforms">
+    <div class="section-label"><span class="section-num">03</span>5 платформ</div>
+    <h2 class="section-title"><span class="section-title-hl">Контент-стратегия по пяти площадкам</span></h2>
+    <hr class="section-hr">
+
+    <p style="color: var(--ink-2); font-size: 15px; line-height: 1.65; margin-bottom: 24px;">Каждая площадка — это свой формат, своя аудитория и своя частота. Не пытайтесь под одну гребёнку: то, что заходит в TikTok, утонет в Дзене, и наоборот.</p>
+
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-name">Instagram*</div>
+        <span class="service-tag tag-paid">Серая зона</span>
+        <div class="service-desc">Три формата: Reels, посты, Stories. Reels — главный двигатель аудитории, минимум 3 раза в неделю, в идеале — ежедневно. Посты лучше как карусели. Stories — 3–4 раза в неделю по 5–10 шт., с инфоповодом, не «доброе утро».</div>
+        <a class="service-link" href="https://instagram.com" target="_blank">↗ instagram.com</a>
+      </div>
+      <div class="service-card">
+        <div class="service-name">Telegram</div>
+        <span class="service-tag tag-free">Легально</span>
+        <div class="service-desc">Площадка постов: 4 поста в неделю — нормальный темп. Кружочки и голосовые играют роль сторис, но не злоупотребляйте: текст быстрее «считывается», чем 1-минутное голосовое.</div>
+        <a class="service-link" href="https://telegram.org" target="_blank">↗ telegram.org</a>
+      </div>
+      <div class="service-card">
+        <div class="service-name">ВКонтакте</div>
+        <span class="service-tag tag-free">Легально</span>
+        <div class="service-desc">Основа — посты с текстом, фото, видео. Сторис как в Instagram* (можно дублировать оттуда — собирают хорошие охваты). Клипы — главный инструмент роста: чаще = лучше.</div>
+        <a class="service-link" href="https://vk.com" target="_blank">↗ vk.com</a>
+      </div>
+      <div class="service-card">
+        <div class="service-name">YouTube</div>
+        <span class="service-tag tag-paid">Серая зона</span>
+        <div class="service-desc">Длинные горизонтальные видео — раз в неделю, с настоящей пользой и разбором. Shorts (короткие вертикальные) — 4–5 раз в неделю: нарезки из длинных или вовлекающие ролики на канал.</div>
+        <a class="service-link" href="https://youtube.com" target="_blank">↗ youtube.com</a>
+      </div>
+      <div class="service-card">
+        <div class="service-name">Яндекс.Дзен</div>
+        <span class="service-tag tag-free">Легально</span>
+        <div class="service-desc">Тексты от 1500 до 5000 знаков с экспертным уклоном — 3–4 в неделю. Короткие заметки до 1000 знаков — около 3 в неделю. Видео — экспертные обзоры и разборы.</div>
+        <a class="service-link" href="https://dzen.ru" target="_blank">↗ dzen.ru</a>
+      </div>
+      <div class="service-card">
+        <div class="service-name">Принцип адаптации</div>
+        <span class="service-tag tag-free">Принцип</span>
+        <div class="service-desc">Не дублируем «как есть», а адаптируем под формат каждой площадки. Один материал — несколько упаковок. Подробнее — в уроке 3.3 «Один пост — три площадки».</div>
+      </div>
+    </div>
+
+    <div class="callout-warn">
+      <strong>Где искать темы для каждой площадки.</strong> Темы зависят от возраста аудитории. В TikTok — очень молодая аудитория, школьники. В Дзене — взрослые читатели длинных текстов. Перед составлением плана сверьтесь: вашу тему и тон вообще ждут на этой платформе?
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 04: ЧАСТОТА И ТЕМП -->
+  <section class="section" id="rhythm">
+    <div class="section-label"><span class="section-num">04</span>Частота и темп</div>
+    <h2 class="section-title"><span class="section-title-hl">Сколько публиковать, чтобы расти и не выгорать</span></h2>
+    <hr class="section-hr">
+
+    <div class="key-point" style="margin-bottom: 24px;">
+      <div class="key-point-label">Главное</div>
+      <p>Из соцсетей пропадать нельзя. Минимум — 4 раза в неделю. Максимум — каждый день, но с лайфхаком, чтобы это не съедало по два часа.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Два режима постинга</div>
+      <ul class="steps-list">
+        <li>
+          <div>
+            <div class="step-title">Минимальный — 4 раза в неделю</div>
+            <div class="step-desc">Это нижний порог, при котором алгоритмы не «режут» страницу. Сторис могут не выходить каждый день, но в основной ленте материал должен появляться хотя бы 4 раза.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Максимальный — каждый день</div>
+            <div class="step-desc">Если цель — быстрый рост, посты, фото и рилс выходят ежедневно. Алгоритмы Instagram* сейчас прямо просят чем чаще, тем лучше — особенно по рилс.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Лайфхак от Анастасии</div>
+      <h3>10-секундное видео + содержательный текст = ежедневная публикация</h3>
+      <p>Чтобы выкладывать каждый день, не нужно сидеть по два часа над монтажом. Возьмите <span class="hl-line">небольшой кусочек видео на 10 секунд</span> — даже неправленый, без склеек, без обработки. И подпишите его содержательным текстом: одна мысль, одна история, один совет.</p>
+      <p style="margin-top: 8px;">На такой пост уходит 15 минут вместо двух часов. Алгоритмы видят регулярность — этого достаточно.</p>
+    </div>
+
+    <div class="divider">Как распределять контент по форматам</div>
+
+    <div class="card">
+      <div class="card-label">Логика разделения</div>
+      <ul class="steps-list">
+        <li>
+          <div>
+            <div class="step-title">Посты и Reels — экспертный контент</div>
+            <div class="step-desc">Сюда идут лайфхаки, советы, разборы кейсов, истории из практики. Анастасия как учитель публикует «как удержать дисциплину на уроке», «как провести творческий урок», «лайфхаки подготовки».</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Stories — закулисье и тесный контакт</div>
+            <div class="step-desc">Если в Reels — лайфхаки урока, то в Stories — общение с учениками на переменах, столовая, ваше настроение. То, что не попадает в «парадный» контент, но даёт ощущение живого человека.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Прямые ответы и кружочки — для близкого контакта</div>
+            <div class="step-desc">Появляйтесь «говорящей головой» в ответах подписчикам, в директе. Это укрепляет и ускоряет переход «зритель → подписчик → клиент».</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-card compare-bad">
+        <div class="compare-header">Слабый подход</div>
+        <p><strong>«Поймаю вдохновение — запишу всё»</strong></p>
+        <p>Полтора месяца тишины, потом резкий всплеск из 10 публикаций за два дня. Алгоритмы воспринимают это как новый аккаунт, охваты режутся. Подписчики за время паузы успели потерять интерес.</p>
+        <p style="color:#C03030; font-size:12px; font-weight:600; margin-top:8px;">Скачки = потеря аудитории и охвата.</p>
+      </div>
+      <div class="compare-card compare-good">
+        <div class="compare-header">Сильный подход</div>
+        <p><strong>«4 раза в неделю минимум, лайфхак на 10 секунд для занятых дней»</strong></p>
+        <p>Ровный темп. В дни, когда нет сил на полноценный монтаж, выходит короткий пост с содержательным текстом. Алгоритмы видят регулярность, аудитория видит автора в ленте. Прирост стабильный.</p>
+        <p style="color:#4A8000; font-size:12px; font-weight:600; margin-top:8px;">Регулярность сильнее редких пиков.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 05: ЧЕК-ЛИСТ -->
+  <section class="section section-alt" id="checklist">
+    <div class="section-label"><span class="section-num">05</span>Чек-лист</div>
+    <h2 class="section-title"><span class="section-title-hl">Чек-лист готового контент-плана на месяц</span></h2>
+    <hr class="section-hr">
+
+    <div class="checklist-progress">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <span class="progress-label" id="progress-label">0 / 12</span>
+    </div>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">База</div>
+      <ul class="checklist-items" id="checklist-items">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">У меня есть «банк идей» — заметка в телефоне или таблица, куда я скидываю мысли в моменте</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">У меня есть папка с готовыми заготовками — рилс, фото, тексты на «чёрный день»</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я выбрала 1–2 основных площадки и понимаю формат каждой</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я знаю свой минимум — 4 публикации в неделю — и не опускаюсь ниже</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">Контент-план на месяц</div>
+      <ul class="checklist-items">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Расписаны 3–4 постоянные рубрики — то, что выходит регулярно</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Есть «карман для живого» — место для эмоций и спонтанных публикаций</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Распределено: что — экспертное (Reels, посты), что — закулисье (Stories)</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Понятно, как один материал адаптировать под 2 разные площадки</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="checklist-group">
+      <div class="checklist-group-title">Темп и устойчивость</div>
+      <ul class="checklist-items">
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">У меня есть лайфхак для «занятых дней» — 10-секундное видео + содержательный текст</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я учла отпуск/каникулы — на эти дни заранее подготовлены заготовки</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я не воспринимаю отписки как провал — понимаю про естественный отток</span>
+        </li>
+        <li class="checklist-item" onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span class="check-text">Я готова отступать от плана ради живой эмоции — он опора, не клетка</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- СЕКЦИЯ 06: ГЛОССАРИЙ -->
+  <section class="section section-alt" id="glossary">
+    <div class="section-label"><span class="section-num">06</span>Глоссарий</div>
+    <h2 class="section-title"><span class="section-title-hl">Глоссарий урока</span></h2>
+    <hr class="section-hr">
+
+    <div class="glossary">
+      <div class="glossary-item">
+        <div class="glossary-term">Контент-план</div>
+        <div class="glossary-def">Перечень идей, заготовок и готовых публикаций, которые автор планирует выкладывать в ближайшее время. Может быть жёстким (расписан по датам) или мягким (банк идей, из которого берётся то, что подходит сегодня). Главная функция — страховка от пауз в постинге.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Банк идей</div>
+        <div class="glossary-def">Заметка в телефоне или таблица, куда автор записывает темы и мысли в моменте — даже перед сном. К утру забудется, поэтому фиксация сразу. Работает как мини-резерв для дней без вдохновения.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Естественный отток</div>
+        <div class="glossary-def">Ежедневные отписки, которые есть у любого активного блога — около 100–150 человек в день. Не показатель «плохого контента», а норма. Блог растёт, когда прирост перекрывает отток.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Регулярность</div>
+        <div class="glossary-def">Стабильный темп публикаций — минимум 4 раза в неделю. Алгоритмы реагируют именно на ритм, а не на пиковые всплески. Перерыв в неделю-две сильно режет охваты, даже если потом «навёрстывать».</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Лайфхак на 10 секунд</div>
+        <div class="glossary-def">Способ выкладывать каждый день без двухчасового монтажа: короткий неправленый кусок видео + содержательная подпись с одной мыслью. Алгоритмам этого достаточно для регистрации регулярности.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Карман для живого</div>
+        <div class="glossary-def">Зона в контент-плане для спонтанных публикаций «по эмоции». План не клетка: если хочется выйти прямо сейчас с тем, что чувствуешь, — выходишь. План закрывает остальные дни.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Адаптация под площадку</div>
+        <div class="glossary-def">Переупаковка одного материала под формат и ритм каждой соцсети: длинный текст в Telegram → нарезка в TikTok → карусель в Instagram*. Не дублирование, а адаптация. Подробно — в уроке 3.3.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Закулисье</div>
+        <div class="glossary-def">Контент, который не попадает в «парадный» профиль, но показывает живого человека: за работой, в перерывах, в общении с близкими. В сторис закулисье работает лучше, чем экспертные тексты.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ЗАДАНИЕ -->
+  <section class="section section-alt" id="task">
+    <div class="task-dark">
+      <h3>Практическое задание</h3>
+      <p>Соберите свою первую систему. Не «идеальный контент-план», а рабочий: банк идей + заготовки + расписание.</p>
+      <ul class="task-steps">
+        <li>
+          <span class="task-step-num">01</span>
+          <span>Откройте заметку в телефоне или таблицу. За 30 минут <strong style="color:#fff;">накидайте 30+ идей</strong> для постов и видео — без фильтра, всё, что приходит в голову.</span>
+        </li>
+        <li>
+          <span class="task-step-num">02</span>
+          <span>Выберите 1–2 платформы и расставьте на 7 дней <strong style="color:#fff;">минимальный темп — 4 публикации</strong>. Распределите: что в посты, что в Stories, что в Reels.</span>
+        </li>
+        <li>
+          <span class="task-step-num">03</span>
+          <span>Снимите <strong style="color:#fff;">одну заготовку</strong> и положите её в папку «на чёрный день» — даже если она не нужна сейчас.</span>
+        </li>
+        <li>
+          <span class="task-step-num">04</span>
+          <span>Возьмите одну идею из плана и адаптируйте её под <strong style="color:#fff;">2 разных формата</strong> (например, развёрнутый пост в Telegram + 10-секундный рилс на ту же тему).</span>
+        </li>
+      </ul>
+      <a class="btn-accent" onclick="navTo('checklist')" style="cursor:pointer;">
+        Открыть чек-лист ↑
+      </a>
+    </div>
+  </section>
+
+  <!-- СНОСКА -->
+  <footer class="footnote">
+    <p><span class="footnote-mark">*</span> Instagram принадлежит компании Meta, признанной экстремистской и запрещённой на территории Российской Федерации.</p>
+  </footer>
+
+</div>
+
+<script>
+  function navTo(id) {
+    const el = document.getElementById(id);
+    if (el) { window.scrollTo({ top: el.offsetTop - 60, behavior: 'smooth' }); }
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const sections = ['intro','risk','platforms','rhythm','checklist','glossary'];
+    const idx = sections.indexOf(id);
+    if (idx > -1) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  }
+  function toggleCheck(item) { item.classList.toggle('checked'); updateProgress(); }
+  function updateProgress() {
+    const all = document.querySelectorAll('.checklist-item');
+    const done = document.querySelectorAll('.checklist-item.checked');
+    const pct = all.length ? Math.round((done.length / all.length) * 100) : 0;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = done.length + ' / ' + all.length;
+  }
+  updateProgress();
+  window.addEventListener('scroll', () => {
+    const sections = ['intro','risk','platforms','rhythm','checklist','glossary','task'];
+    const offset = 120;
+    let current = 0;
+    sections.forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el && window.scrollY + offset >= el.offsetTop) current = i;
+    });
+    document.querySelectorAll('.nav-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === Math.min(current, 5));
+    });
+  });
+</script>
+
+</body>
+</html>
