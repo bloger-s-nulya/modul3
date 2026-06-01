@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Модуль 3 · Урок 3 — Кроссплатформенный постинг</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FFFFFF;
+  --bg-soft: #F5F6F7;
+  --bg-muted: #EDEEF0;
+  --ink: #1A1A1A;
+  --ink-2: #4A4D52;
+  --ink-3: #8A8E94;
+  --line: #E4E6E9;
+  --accent: #C4F542;
+  --accent-strong: #B8E83D;
+  --accent-ink: #0F1A00;
+  --font-display: 'Unbounded', sans-serif;
+  --font-body: 'Manrope', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--bg);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.progress-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; height: 3px; background: var(--line); }
+.progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.2s; }
+
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-brand { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.nav-title { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--ink); }
+.nav-time { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
+.nav-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 64px 32px 120px; }
+
+/* HERO */
+.hero { margin-bottom: 56px; }
+.hero-eyebrow {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--ink-3); }
+.hero-title {
+  display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start;
+  margin-bottom: 24px;
+}
+.stamp {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 8px 14px; background: var(--accent); color: var(--accent-ink);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-top: 8px; white-space: nowrap;
+}
+.title-text {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: clamp(24px, 3.5vw, 36px); line-height: 1.1; letter-spacing: -0.02em;
+}
+.hero-lead { font-size: 17px; font-weight: 500; line-height: 1.6; color: var(--ink-2); margin-bottom: 20px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; background: var(--bg-soft); border: 1px solid var(--line);
+  border-radius: var(--radius-pill); font-size: 12px; font-weight: 500;
+  color: var(--ink-2); font-family: var(--font-mono);
+}
+
+/* SECTIONS */
+.section {
+  margin-bottom: 56px; padding-top: 40px; border-top: 1px solid var(--line);
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.section.visible { opacity: 1; transform: translateY(0); }
+.section-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+.section h2 { font-family: var(--font-display); font-weight: 500; font-size: 22px; letter-spacing: -0.01em; margin-bottom: 20px; }
+
+/* KEY POINT */
+.key-point {
+  display: flex; gap: 16px; background: var(--bg-soft);
+  border-radius: var(--radius-md); padding: 20px 24px;
+  border-left: 3px solid var(--accent); margin: 20px 0;
+}
+.key-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; padding-top: 3px; }
+.key-point p { font-weight: 500; margin: 0; }
+
+/* CARD */
+.card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 24px 28px; margin: 16px 0; }
+.card-eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 14px; }
+
+/* STEPS */
+.steps { counter-reset: step; list-style: none; padding: 0; display: grid; gap: 0; }
+.steps li {
+  counter-increment: step;
+  display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start;
+  padding: 16px 0; border-bottom: 1px solid var(--line);
+}
+.steps li:last-child { border-bottom: none; }
+.steps li::before { content: counter(step, decimal-leading-zero); font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--ink-3); padding-top: 3px; }
+.step-title { font-weight: 600; margin-bottom: 4px; }
+.step-desc { font-size: 14px; color: var(--ink-2); line-height: 1.5; }
+
+/* ГЛАВНЫЙ ПРИНЦИП — СХЕМА ОДНА ИДЕЯ */
+.one-idea {
+  background: var(--ink); border-radius: var(--radius-lg);
+  padding: 28px 32px; margin: 20px 0;
+  display: grid; gap: 16px;
+}
+.one-idea-title {
+  font-family: var(--font-display); font-weight: 600; font-size: 18px;
+  color: #fff; margin-bottom: 4px;
+}
+.one-idea-sub { font-size: 14px; color: #8A8E94; margin-bottom: 12px; }
+.idea-flow {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.idea-node {
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-sm); padding: 10px 16px;
+  font-size: 13px; font-weight: 600; color: #fff;
+}
+.idea-node.center { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.idea-arrow { color: #8A8E94; font-size: 16px; }
+
+/* СВЯЗКИ ПЛОЩАДОК */
+.bundles { display: grid; gap: 12px; margin: 16px 0; }
+.bundle {
+  border: 1px solid var(--line); border-radius: var(--radius-md);
+  overflow: hidden; cursor: pointer;
+  transition: border-color 0.2s;
+}
+.bundle:hover { border-color: var(--accent); }
+.bundle.open { border-color: var(--accent); }
+.bundle-head {
+  display: grid; grid-template-columns: 1fr auto;
+  align-items: center; padding: 16px 20px; gap: 12px;
+}
+.bundle-title { font-weight: 700; font-size: 15px; }
+.bundle-platforms { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+.platform-tag {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px;
+}
+.tag-vk { background: #E8F0FF; color: #1D4ED8; }
+.tag-dzen { background: #FFF3E0; color: #C2410C; }
+.tag-max { background: #F3E8FF; color: #7C3AED; }
+.tag-other { background: var(--bg-muted); color: var(--ink-3); }
+.tag-main { background: var(--accent); color: var(--accent-ink); }
+.bundle-toggle {
+  width: 24px; height: 24px; border-radius: 50%; background: var(--bg-soft);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--ink-3); flex-shrink: 0;
+  transition: transform 0.25s, background 0.2s;
+}
+.bundle.open .bundle-toggle { transform: rotate(180deg); background: var(--accent); color: var(--accent-ink); }
+.bundle-body { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1); }
+.bundle.open .bundle-body { max-height: 400px; }
+.bundle-content { padding: 0 20px 18px; border-top: 1px solid var(--line); padding-top: 16px; }
+.bundle-role { display: grid; gap: 8px; }
+.bundle-role-row { display: grid; grid-template-columns: 100px 1fr; gap: 12px; align-items: start; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.bundle-role-row:last-child { border-bottom: none; }
+.bundle-role-name { font-weight: 700; }
+.bundle-role-desc { color: var(--ink-2); }
+.bundle-tip { font-size: 13px; color: var(--ink-3); margin-top: 12px; font-style: italic; }
+
+/* РАСПИСАНИЕ НЕДЕЛЯ */
+.week { display: grid; gap: 10px; margin: 16px 0; }
+.day {
+  border: 1px solid var(--line); border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.day-head {
+  display: grid; grid-template-columns: 80px 1fr;
+  align-items: center; padding: 12px 18px; gap: 12px;
+  background: var(--bg-soft); cursor: pointer;
+  transition: background 0.2s;
+}
+.day-head:hover { background: var(--bg-muted); }
+.day.open .day-head { background: var(--ink); }
+.day-name { font-family: var(--font-display); font-weight: 600; font-size: 13px; color: var(--ink); }
+.day.open .day-name { color: #fff; }
+.day-preview { font-size: 12px; color: var(--ink-3); font-family: var(--font-mono); }
+.day.open .day-preview { color: rgba(255,255,255,0.5); }
+.day-body { max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1); }
+.day.open .day-body { max-height: 300px; }
+.day-content { padding: 14px 18px; display: grid; gap: 8px; }
+.day-row { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+.day-platform { flex-shrink: 0; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 4px; margin-top: 1px; }
+.day-text { color: var(--ink-2); }
+
+/* АДАПТАЦИЯ — ТАБЫ ПЛОЩАДОК */
+.adapt-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.adapt-tab {
+  padding: 8px 16px; border-radius: var(--radius-pill);
+  border: 1px solid var(--line); background: var(--bg);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all 0.15s; font-family: var(--font-body);
+  color: var(--ink-2);
+}
+.adapt-tab.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.adapt-content { display: none; }
+.adapt-content.active { display: block; }
+.adapt-example {
+  background: var(--bg-soft); border-radius: var(--radius-md);
+  padding: 20px 24px; margin: 12px 0;
+  font-size: 15px; line-height: 1.7; color: var(--ink);
+  border-left: 3px solid var(--line);
+}
+.adapt-content.active .adapt-example { border-left-color: var(--accent); }
+.adapt-format {
+  font-family: var(--font-mono); font-size: 11px; color: var(--ink-3);
+  margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+/* ЧТО ДУБЛИРОВАТЬ / АДАПТИРОВАТЬ */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+.col-box { border-radius: var(--radius-md); padding: 20px 22px; }
+.col-box.yes { background: #F0FDF4; border: 1px solid #BBF7D0; }
+.col-box.adapt { background: var(--bg-soft); border: 1px solid var(--line); }
+.col-title {
+  font-weight: 700; font-size: 14px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.col-title.yes { color: #15803D; }
+.col-title.adapt { color: var(--ink); }
+.col-list { list-style: none; display: grid; gap: 6px; }
+.col-list li { font-size: 13px; color: var(--ink-2); display: flex; gap: 8px; }
+.col-list li::before { content: '·'; font-weight: 700; flex-shrink: 0; }
+.col-box.yes .col-list li::before { color: #16A34A; }
+.col-box.adapt .col-list li::before { color: var(--accent-strong); }
+
+/* ТАБЛИЦА */
+.table-wrap { overflow-x: auto; margin: 16px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  background: var(--bg-soft); padding: 10px 14px; text-align: left;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3);
+  border-bottom: 1px solid var(--line);
+}
+td { padding: 12px 14px; border-bottom: 1px solid var(--line); color: var(--ink-2); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+td:first-child { font-weight: 600; color: var(--ink); font-family: var(--font-display); font-size: 12px; }
+.status-done { background: var(--accent); color: var(--accent-ink); border-radius: 4px; padding: 2px 8px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; }
+.status-wip { background: var(--bg-muted); color: var(--ink-3); border-radius: 4px; padding: 2px 8px; font-family: var(--font-mono); font-size: 10px; }
+
+/* ИНСТРУМЕНТЫ */
+.tools { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
+.tool {
+  border: 1px solid var(--line); border-radius: var(--radius-md); padding: 18px 20px;
+  transition: border-color 0.2s;
+}
+.tool:hover { border-color: var(--accent); }
+.tool-cat { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+.tool-list { list-style: none; display: grid; gap: 5px; }
+.tool-list li { font-size: 13px; color: var(--ink-2); display: flex; gap: 8px; }
+.tool-list li::before { content: '·'; color: var(--accent-strong); font-weight: 700; flex-shrink: 0; }
+
+/* CHECKLIST */
+.checklist-wrap {
+  background: var(--bg-soft); border-radius: var(--radius-lg);
+  padding: 28px 32px; margin: 24px 0;
+  border: 1px solid var(--line);
+}
+.checklist-title {
+  font-family: var(--font-display); font-weight: 600; font-size: 18px;
+  margin-bottom: 6px;
+}
+.checklist-sub { font-size: 14px; color: var(--ink-2); margin-bottom: 24px; line-height: 1.6; }
+.checklist { list-style: none; padding: 0; display: grid; gap: 10px; }
+.checklist li {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 14px 18px; background: var(--bg); border: 1px solid var(--line);
+  border-radius: var(--radius-md); cursor: pointer;
+  transition: border-color 0.2s, background 0.2s; user-select: none;
+}
+.checklist li:hover { border-color: var(--ink-3); }
+.checklist li.done { background: #FAFFF0; border-color: var(--accent); }
+.check-box {
+  flex: 0 0 22px; width: 22px; height: 22px; border-radius: 7px;
+  border: 1.5px solid var(--line); margin-top: 2px;
+  transition: all 0.2s; position: relative; background: var(--bg);
+}
+.checklist li.done .check-box { background: var(--accent); border-color: var(--accent); }
+.checklist li.done .check-box::after {
+  content: ''; position: absolute; left: 6px; top: 2px;
+  width: 6px; height: 11px;
+  border-right: 2px solid var(--accent-ink);
+  border-bottom: 2px solid var(--accent-ink);
+  transform: rotate(45deg);
+}
+.task-title { font-weight: 600; font-size: 15px; }
+.task-meta { font-size: 12px; color: var(--ink-3); margin-top: 3px; font-family: var(--font-mono); }
+
+.progress-wrap { margin-top: 20px; }
+.progress-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; display: flex; justify-content: space-between; }
+.progress-track { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.progress-done { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
+.progress-note { font-size: 12px; color: var(--ink-3); margin-top: 10px; line-height: 1.5; }
+
+/* PRE-PUBLISH CHECKLIST */
+.pub-checklist { display: grid; gap: 8px; margin: 16px 0; }
+.pub-item {
+  display: flex; gap: 12px; align-items: center; padding: 12px 16px;
+  border: 1px solid var(--line); border-radius: var(--radius-md);
+  font-size: 14px; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s; user-select: none;
+}
+.pub-item:hover { border-color: var(--ink-3); }
+.pub-item.checked { background: #FAFFF0; border-color: var(--accent); color: var(--ink-3); text-decoration: line-through; }
+.pub-box {
+  flex: 0 0 20px; width: 20px; height: 20px; border-radius: 5px;
+  border: 1.5px solid var(--line); position: relative; background: var(--bg);
+  transition: all 0.2s; flex-shrink: 0;
+}
+.pub-item.checked .pub-box { background: var(--accent); border-color: var(--accent); }
+.pub-item.checked .pub-box::after {
+  content: ''; position: absolute; left: 5px; top: 1px;
+  width: 5px; height: 9px;
+  border-right: 2px solid var(--accent-ink);
+  border-bottom: 2px solid var(--accent-ink);
+  transform: rotate(45deg);
+}
+
+/* CALLOUT */
+.callout-dark {
+  background: var(--ink); color: #fff;
+  border-radius: var(--radius-lg); padding: 28px 32px; margin: 32px 0;
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.callout-dark.visible { opacity: 1; transform: translateY(0); }
+.callout-dark h3 { font-family: var(--font-display); font-weight: 500; font-size: 20px; margin-bottom: 10px; }
+.callout-dark p { color: #CFD1D4; font-size: 15px; line-height: 1.65; }
+
+/* FORMULA */
+.formula-box {
+  background: var(--bg-soft); border-radius: var(--radius-md);
+  padding: 24px 28px; margin: 16px 0; text-align: center;
+}
+.formula-text {
+  font-family: var(--font-display); font-weight: 600; font-size: 16px;
+  color: var(--ink); line-height: 1.7;
+}
+.formula-text span { background: var(--accent); color: var(--accent-ink); padding: 2px 8px; border-radius: 6px; }
+
+/* DIVIDER */
+.divider { display: flex; align-items: center; gap: 16px; margin: 32px 0; color: var(--ink-3); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-body); font-weight: 600; font-size: 15px;
+  padding: 14px 24px; border-radius: var(--radius-pill);
+  border: none; cursor: pointer; transition: all 0.15s; text-decoration: none;
+}
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { background: var(--accent-strong); }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn-ghost:hover { background: var(--bg-muted); }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px; }
+
+.hl { background: var(--accent); color: var(--accent-ink); padding: 2px 8px; border-radius: 6px; font-weight: 600; }
+.hl-line { background-image: linear-gradient(transparent 55%, var(--accent) 55%, var(--accent) 92%, transparent 92%); padding: 0 2px; font-weight: 600; }
+
+@media (max-width: 640px) {
+  .nav { padding: 12px 20px; }
+  .nav-title { display: none; }
+  .wrap { padding: 40px 20px 80px; }
+  .hero-title { grid-template-columns: 1fr; }
+  .two-col { grid-template-columns: 1fr; }
+  .tools { grid-template-columns: 1fr; }
+  .idea-flow { flex-direction: column; align-items: flex-start; }
+  .bundle-role-row { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<nav class="nav">
+  <div class="nav-brand">Модуль 3 · Урок 3</div>
+  <div class="nav-title">Кроссплатформенный постинг</div>
+  <div class="nav-time"><div class="nav-dot"></div>~20 мин чтения</div>
+</nav>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-eyebrow">Модуль 3 · Урок 3</div>
+    <div class="hero-title">
+      <span class="stamp">Гайд</span>
+      <span class="title-text">Как вести 2–3 площадки и не превратиться в медиахолдинг</span>
+    </div>
+    <p class="hero-lead">Кроссплатформенный постинг — это не про то, чтобы быть везде. Это про то, чтобы один смысл работал на нескольких площадках без ощущения, что вы — SMM-отдел в одном лице.</p>
+    <div class="chips">
+      <span class="chip">2–3 площадки</span>
+      <span class="chip">Одна — приоритет</span>
+      <span class="chip">Примеры связок</span>
+      <span class="chip">Готовый план</span>
+    </div>
+  </header>
+
+  <!-- 1. ГЛАВНЫЙ ПРИНЦИП -->
+  <section class="section" id="s1">
+    <div class="section-label">01 — Принцип</div>
+    <h2>Главная задача — не быть везде</h2>
+
+    <p style="margin-bottom: 16px;">Площадку для приоритетного блога вы уже выбрали в модуле 1. Здесь мы не выбираем заново — здесь разбираем, <span class="hl-line">как организовать работу с несколькими площадками</span> так, чтобы не делать отдельный контент для каждой и не выгорать через месяц.</p>
+
+    <div class="key-point">
+      <div class="key-label">Главное</div>
+      <p>1 приоритетная площадка + 1–2 дополнительные. Приоритет — площадкам, которые легально и стабильно работают в России: <strong>VK, Дзен</strong>. Max — как альтернатива Telegram для быстрых касаний.</p>
+    </div>
+
+    <div class="one-idea">
+      <div>
+        <div class="one-idea-title">Главная формула</div>
+        <div class="one-idea-sub">Одна идея → основной контент → адаптация под 1–2 площадки</div>
+      </div>
+      <div class="idea-flow">
+        <div class="idea-node center">💡 Одна идея</div>
+        <div class="idea-arrow">→</div>
+        <div class="idea-node">Пост во VK</div>
+        <div class="idea-arrow">→</div>
+        <div class="idea-node">Статья в Дзен</div>
+        <div class="idea-arrow">→</div>
+        <div class="idea-node">Анонс в Max</div>
+      </div>
+      <p style="color: #8A8E94; font-size: 14px;">Смысл один. Упаковка разная. Вы не придумываете новое — вы адаптируете уже созданное.</p>
+    </div>
+  </section>
+
+  <!-- 2. ТРИ ТИПА ПЛОЩАДОК -->
+  <section class="section" id="s2">
+    <div class="section-label">02 — Роли площадок</div>
+    <h2>Как разделить роли между площадками</h2>
+
+    <div class="card">
+      <div class="card-eyebrow">Приоритетная площадка</div>
+      <p style="margin-bottom: 12px;">Центр вашей системы. Туда идёт основной контент: посты, видео, прогревы, продажи, общение с аудиторией. Больше всего внимания — сюда.</p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <span class="platform-tag tag-vk">VK</span>
+        <span class="platform-tag tag-dzen">Дзен</span>
+        <span class="platform-tag tag-main">Ваш выбор из модуля 1</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-eyebrow">Дополнительные площадки</div>
+      <p style="margin-bottom: 12px;">Не «ещё один полноценный блог». Их задача — дополнительный охват, адаптированный контент, страховка если одна площадка просядет. Здесь можно проще, короче и реже.</p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <span class="platform-tag tag-vk">VK</span>
+        <span class="platform-tag tag-dzen">Дзен</span>
+        <span class="platform-tag tag-other">Другие площадки</span>
+      </div>
+    </div>
+
+    <div class="card" style="border-color: #DDD6FE;">
+      <div class="card-eyebrow">Max — канал быстрых касаний</div>
+      <p style="margin-bottom: 12px;">Не классическая контентная площадка, а аналог Telegram-канала: анонсы, короткие заметки, ссылки, общение, напоминания. Работает как дополнительная точка контакта.</p>
+      <div class="adapt-example" style="font-size: 14px; font-style: italic; color: var(--ink-2); margin-top: 12px; margin-bottom: 0;">
+        Пример: основной пост вышел во VK. В Max пишете: «Выложила новый пост про то, как вести блог на двух площадках и не сойти с ума. Забирайте, если сейчас пытаетесь объять необъятное.»
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. СВЯЗКИ -->
+  <section class="section" id="s3">
+    <div class="section-label">03 — Примеры связок</div>
+    <h2>Пять рабочих связок площадок</h2>
+    <p style="color: var(--ink-2); margin-bottom: 20px;">Нажмите на связку — посмотрите, кому подходит и как устроена.</p>
+
+    <div class="bundles" id="bundles">
+
+      <div class="bundle" onclick="toggleBundle(this)">
+        <div class="bundle-head">
+          <div>
+            <div class="bundle-title">VK + Max</div>
+            <div class="bundle-platforms">
+              <span class="platform-tag tag-main">VK — главная</span>
+              <span class="platform-tag tag-max">Max — касания</span>
+            </div>
+          </div>
+          <div class="bundle-toggle">▼</div>
+        </div>
+        <div class="bundle-body"><div class="bundle-content">
+          <div class="bundle-role">
+            <div class="bundle-role-row"><div class="bundle-role-name">VK</div><div class="bundle-role-desc">Основной контент: посты, фото, клипы, прогревы, продажи, обсуждения.</div></div>
+            <div class="bundle-role-row"><div class="bundle-role-name">Max</div><div class="bundle-role-desc">Короткие анонсы, напоминания, быстрые сообщения, поддержание контакта.</div></div>
+          </div>
+          <div class="bundle-tip">Подходит тем, кто хочет строить блог на стабильной российской площадке и иметь быстрый канал связи с аудиторией.</div>
+        </div></div>
+      </div>
+
+      <div class="bundle" onclick="toggleBundle(this)">
+        <div class="bundle-head">
+          <div>
+            <div class="bundle-title">VK + Дзен</div>
+            <div class="bundle-platforms">
+              <span class="platform-tag tag-main">VK — главная</span>
+              <span class="platform-tag tag-dzen">Дзен — длинные тексты</span>
+            </div>
+          </div>
+          <div class="bundle-toggle">▼</div>
+        </div>
+        <div class="bundle-body"><div class="bundle-content">
+          <div class="bundle-role">
+            <div class="bundle-role-row"><div class="bundle-role-name">VK</div><div class="bundle-role-desc">Регулярный контент, сообщество, фото, клипы, коммуникация.</div></div>
+            <div class="bundle-role-row"><div class="bundle-role-name">Дзен</div><div class="bundle-role-desc">Длинные тексты, статьи, личные истории, экспертные разборы.</div></div>
+          </div>
+          <div class="bundle-tip">Подходит тем, кто любит писать подробно и хочет дополнительный органический охват через Дзен.</div>
+        </div></div>
+      </div>
+
+      <div class="bundle" onclick="toggleBundle(this)">
+        <div class="bundle-head">
+          <div>
+            <div class="bundle-title">Дзен + VK</div>
+            <div class="bundle-platforms">
+              <span class="platform-tag tag-main">Дзен — главная</span>
+              <span class="platform-tag tag-vk">VK — короткие версии</span>
+            </div>
+          </div>
+          <div class="bundle-toggle">▼</div>
+        </div>
+        <div class="bundle-body"><div class="bundle-content">
+          <div class="bundle-role">
+            <div class="bundle-role-row"><div class="bundle-role-name">Дзен</div><div class="bundle-role-desc">Статьи, истории, экспертность, длинные разборы — основная работа здесь.</div></div>
+            <div class="bundle-role-row"><div class="bundle-role-name">VK</div><div class="bundle-role-desc">Короткие версии материалов, фото, клипы, общение, анонсы.</div></div>
+          </div>
+          <div class="bundle-tip">Подходит тем, у кого сильный текстовый формат и хочется, чтобы один большой материал работал на двух площадках.</div>
+        </div></div>
+      </div>
+
+      <div class="bundle" onclick="toggleBundle(this)">
+        <div class="bundle-head">
+          <div>
+            <div class="bundle-title">VK + Max + Дзен</div>
+            <div class="bundle-platforms">
+              <span class="platform-tag tag-main">VK — главная</span>
+              <span class="platform-tag tag-max">Max — касания</span>
+              <span class="platform-tag tag-dzen">Дзен — статьи</span>
+            </div>
+          </div>
+          <div class="bundle-toggle">▼</div>
+        </div>
+        <div class="bundle-body"><div class="bundle-content">
+          <div class="bundle-role">
+            <div class="bundle-role-row"><div class="bundle-role-name">VK</div><div class="bundle-role-desc">Главная площадка — весь основной контент и коммуникация.</div></div>
+            <div class="bundle-role-row"><div class="bundle-role-name">Max</div><div class="bundle-role-desc">Быстрые анонсы, ссылки, короткие касания, напоминания.</div></div>
+            <div class="bundle-role-row"><div class="bundle-role-name">Дзен</div><div class="bundle-role-desc">Расширенные тексты, статьи, истории — когда есть ресурс.</div></div>
+          </div>
+          <div class="bundle-tip">Устойчивая система внутри российского поля. Важно: даже если площадок три — главная всё равно одна. Не три главных, иначе это уже не стратегия, а кастинг на роль уставшего осьминога.</div>
+        </div></div>
+      </div>
+
+      <div class="bundle" onclick="toggleBundle(this)">
+        <div class="bundle-head">
+          <div>
+            <div class="bundle-title">VK + Max + внешняя площадка</div>
+            <div class="bundle-platforms">
+              <span class="platform-tag tag-main">VK — главная</span>
+              <span class="platform-tag tag-max">Max — касания</span>
+              <span class="platform-tag tag-other">Instagram / YouTube / другое</span>
+            </div>
+          </div>
+          <div class="bundle-toggle">▼</div>
+        </div>
+        <div class="bundle-body"><div class="bundle-content">
+          <div class="bundle-role">
+            <div class="bundle-role-row"><div class="bundle-role-name">VK</div><div class="bundle-role-desc">Основная площадка — центр системы.</div></div>
+            <div class="bundle-role-row"><div class="bundle-role-name">Max</div><div class="bundle-role-desc">Канал быстрых касаний.</div></div>
+            <div class="bundle-role-row"><div class="bundle-role-name">Внешняя</div><div class="bundle-role-desc">Дополнительная витрина, если там уже есть аудитория. Не становится центром системы — туда адаптируется готовый контент.</div></div>
+          </div>
+          <div class="bundle-tip">Для тех, у кого есть наработанная аудитория на других платформах. Центр всё равно — VK.</div>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. АДАПТАЦИЯ -->
+  <section class="section" id="s4">
+    <div class="section-label">04 — Как адаптировать</div>
+    <h2>Один смысл — три формата</h2>
+    <p style="color: var(--ink-2); margin-bottom: 20px;">Допустим, ваша тема: <em>«Почему не нужно делать уникальный контент для каждой соцсети»</em>. Посмотрите, как один смысл выглядит на разных площадках.</p>
+
+    <div class="adapt-tabs">
+      <button class="adapt-tab active" onclick="switchAdapt(this, 'vk')">VK</button>
+      <button class="adapt-tab" onclick="switchAdapt(this, 'dzen')">Дзен</button>
+      <button class="adapt-tab" onclick="switchAdapt(this, 'max')">Max</button>
+      <button class="adapt-tab" onclick="switchAdapt(this, 'video')">Короткое видео</button>
+    </div>
+
+    <div class="adapt-content active" id="adapt-vk">
+      <div class="adapt-format">Пост во VK — основной материал</div>
+      <div class="adapt-example">
+        <strong>Почему не нужно делать разный контент для каждой площадки</strong><br><br>
+        Когда вы пытаетесь делать отдельный контент для каждой соцсети, вы быстро превращаете блог в бесконечный список задач. Гораздо проще взять одну идею и адаптировать её под разные форматы...<br><br>
+        <em style="color: var(--ink-3); font-size: 14px;">Структура: вступление → личный пример → 3–5 тезисов → вывод → вопрос аудитории</em>
+      </div>
+    </div>
+
+    <div class="adapt-content" id="adapt-dzen">
+      <div class="adapt-format">Статья в Дзен — расширенная версия</div>
+      <div class="adapt-example">
+        Тот же смысл разворачивается в полноценную статью: проблема → почему блогеры перегружаются → как работает принцип «одна идея — несколько форматов» → пример адаптации → вывод.<br><br>
+        Дзен хорошо работает с подробными объяснениями и личными историями. Не нужно сокращать — здесь читают длинное.
+      </div>
+    </div>
+
+    <div class="adapt-content" id="adapt-max">
+      <div class="adapt-format">Max — короткий анонс + ссылка</div>
+      <div class="adapt-example">
+        Сегодня разобрала важную тему: почему не нужно делать отдельный контент для каждой площадки. Один смысл можно адаптировать под VK, Дзен и короткие форматы — и это сильно экономит силы. Ссылка на полный пост 👇
+      </div>
+    </div>
+
+    <div class="adapt-content" id="adapt-video">
+      <div class="adapt-format">Reels / Shorts / Клипы — крючок + суть за 30–60 сек</div>
+      <div class="adapt-example">
+        «Ошибка, из-за которой блогеры быстро устают: они пытаются делать уникальный контент для каждой соцсети. На самом деле достаточно взять одну идею и адаптировать её под 2–3 площадки…»<br><br>
+        <em style="color: var(--ink-3); font-size: 14px;">Одна мысль = несколько касаний аудитории</em>
+      </div>
+    </div>
+
+    <div class="key-point" style="margin-top: 20px;">
+      <div class="key-label">Важно</div>
+      <p>Адаптация — это не переписывание с нуля. Это лёгкая настройка под формат: сократить, добавить заголовок, дать ссылку, сделать тон чуть личнее.</p>
+    </div>
+  </section>
+
+  <!-- 5. ЧТО ДУБЛИРОВАТЬ -->
+  <section class="section" id="s5">
+    <div class="section-label">05 — Что как переносить</div>
+    <h2>Что можно дублировать, а что — адаптировать</h2>
+
+    <div class="two-col">
+      <div class="col-box yes">
+        <div class="col-title yes">✓ Можно дублировать почти без правок</div>
+        <ul class="col-list">
+          <li>Анонсы и приглашения</li>
+          <li>Расписание и напоминания</li>
+          <li>Ссылки и короткие новости</li>
+          <li>Простые вопросы аудитории</li>
+          <li>Праздничные и ситуативные посты</li>
+        </ul>
+      </div>
+      <div class="col-box adapt">
+        <div class="col-title adapt">↻ Лучше адаптировать</div>
+        <ul class="col-list">
+          <li>Большие посты и личные истории</li>
+          <li>Экспертные разборы и статьи</li>
+          <li>Продающие тексты</li>
+          <li>Видео и Reels</li>
+          <li>Прогревы и серии постов</li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="font-size: 14px; color: var(--ink-2); margin-top: 16px;">Почему? У каждой площадки свой ритм: во VK лучше работает оформленный пост, в Дзене — развёрнутый материал, в Max — короткое сообщение и быстрый контакт.</p>
+  </section>
+
+  <!-- 6. МЕХАНИКА ПО ШАГАМ -->
+  <section class="section" id="s6">
+    <div class="section-label">06 — Механика</div>
+    <h2>Самая простая рабочая схема</h2>
+
+    <div class="card">
+      <div class="card-eyebrow">Три шага — каждую неделю</div>
+      <ol class="steps">
+        <li>
+          <div>
+            <div class="step-title">Создайте контент для приоритетной площадки</div>
+            <div class="step-desc">Сначала один нормальный материал туда, где у вас центр системы. Не думайте сразу о всех площадках.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Вытащите 2–3 смысловых кусочка</div>
+            <div class="step-desc">Из одного материала можно достать: главную мысль, короткий совет, личный пример, цитату, вопрос для аудитории, тезис для видео.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Адаптируйте под дополнительные площадки</div>
+            <div class="step-desc">Сократите, добавьте заголовок, поменяйте тон, дайте ссылку на основной материал. Не каждая мысль обязана пройти службу во всех родах войск.</div>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="key-point">
+      <div class="key-label">Ритм</div>
+      <p><strong>Основная площадка:</strong> 3–5 публикаций в неделю · <strong>Доп. площадка:</strong> 1–3 публикации · <strong>Max/канал:</strong> короткие касания по мере необходимости</p>
+    </div>
+  </section>
+
+  <!-- 7. ПРИМЕР НЕДЕЛИ -->
+  <section class="section" id="s7">
+    <div class="section-label">07 — Пример</div>
+    <h2>Как выглядит неделя на практике</h2>
+    <p style="color: var(--ink-2); margin-bottom: 16px;">Пример для связки VK + Max + Дзен. Нажмите на день — посмотрите план.</p>
+
+    <div class="week">
+      <div class="day" onclick="toggleDay(this)">
+        <div class="day-head">
+          <div class="day-name">Понедельник</div>
+          <div class="day-preview">VK + Max</div>
+        </div>
+        <div class="day-body"><div class="day-content">
+          <div class="day-row"><span class="day-platform tag-vk">VK</span><div class="day-text">Основной пост с личным опытом — полноценный материал.</div></div>
+          <div class="day-row"><span class="day-platform tag-max">Max</span><div class="day-text">Короткий анонс поста + ссылка.</div></div>
+        </div></div>
+      </div>
+
+      <div class="day" onclick="toggleDay(this)">
+        <div class="day-head">
+          <div class="day-name">Среда</div>
+          <div class="day-preview">VK + Max + Дзен</div>
+        </div>
+        <div class="day-body"><div class="day-content">
+          <div class="day-row"><span class="day-platform tag-vk">VK</span><div class="day-text">Полезный пост или клип.</div></div>
+          <div class="day-row"><span class="day-platform tag-max">Max</span><div class="day-text">Короткое напоминание или вопрос аудитории.</div></div>
+          <div class="day-row"><span class="day-platform tag-dzen">Дзен</span><div class="day-text">Расширенная версия понедельничного поста — если есть ресурс.</div></div>
+        </div></div>
+      </div>
+
+      <div class="day" onclick="toggleDay(this)">
+        <div class="day-head">
+          <div class="day-name">Пятница</div>
+          <div class="day-preview">VK + Max + Дзен</div>
+        </div>
+        <div class="day-body"><div class="day-content">
+          <div class="day-row"><span class="day-platform tag-vk">VK</span><div class="day-text">Продающий или прогревающий пост.</div></div>
+          <div class="day-row"><span class="day-platform tag-max">Max</span><div class="day-text">Короткий анонс / приглашение / ссылка.</div></div>
+          <div class="day-row"><span class="day-platform tag-dzen">Дзен</span><div class="day-text">Статья или история — если есть ресурс и материал.</div></div>
+        </div></div>
+      </div>
+    </div>
+
+    <p style="font-size: 14px; color: var(--ink-2); margin-top: 16px;">Так есть регулярность — но нет ощущения, что вы должны каждый день писать три разных сочинения. Дзен — только когда есть ресурс, не в режиме обязательной программы.</p>
+  </section>
+
+  <!-- 8. КОНТЕНТ-ПЛАН — ТАБЛИЦА -->
+  <section class="section" id="s8">
+    <div class="section-label">08 — Планирование</div>
+    <h2>Контент-план: простая таблица</h2>
+    <p style="color: var(--ink-2); margin-bottom: 16px;">Шаблон — скопируйте в Google Таблицы и заполняйте раз в неделю.</p>
+
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>День</th>
+          <th>Идея / тема</th>
+          <th>Основная</th>
+          <th>Доп. 1</th>
+          <th>Доп. 2</th>
+          <th>Статус</th>
+        </tr>
+        <tr>
+          <td>Пн</td>
+          <td>Почему не нужно быть везде</td>
+          <td>VK</td>
+          <td>Max</td>
+          <td>Дзен</td>
+          <td><span class="status-done">Готово</span></td>
+        </tr>
+        <tr>
+          <td>Ср</td>
+          <td>Как адаптировать один пост</td>
+          <td>VK</td>
+          <td>Max</td>
+          <td>—</td>
+          <td><span class="status-wip">В работе</span></td>
+        </tr>
+        <tr>
+          <td>Пт</td>
+          <td>Приглашение / продажа</td>
+          <td>VK</td>
+          <td>Max</td>
+          <td>Дзен</td>
+          <td><span class="status-wip">В работе</span></td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 9. ИНСТРУМЕНТЫ -->
+  <section class="section" id="s9">
+    <div class="section-label">09 — Инструменты</div>
+    <h2>Чем пользоваться</h2>
+
+    <div class="tools">
+      <div class="tool">
+        <div class="tool-cat">Хранение идей</div>
+        <ul class="tool-list">
+          <li>Заметки в телефоне</li>
+          <li>Закрытый канал / чат с собой</li>
+          <li>Google Docs</li>
+          <li>Notion</li>
+        </ul>
+        <p style="font-size: 12px; color: var(--ink-3); margin-top: 10px;">Главное — одно место. Не десять разных, иначе это уже не контент-план, а кладбище черновиков.</p>
+      </div>
+      <div class="tool">
+        <div class="tool-cat">Планирование</div>
+        <ul class="tool-list">
+          <li>Google Таблица</li>
+          <li>Notion</li>
+          <li>Отложенные публикации во VK</li>
+          <li>Встроенные планировщики площадок</li>
+        </ul>
+      </div>
+      <div class="tool">
+        <div class="tool-cat">Видео и монтаж</div>
+        <ul class="tool-list">
+          <li>CapCut</li>
+          <li>InShot</li>
+          <li>Canva</li>
+          <li>Встроенные редакторы площадок</li>
+        </ul>
+        <p style="font-size: 12px; color: var(--ink-3); margin-top: 10px;">Лучше простой понятный ролик, чем идеальное видео, после монтажа которого вы ушли лежать лицом в плед.</p>
+      </div>
+      <div class="tool">
+        <div class="tool-cat">Оформление</div>
+        <ul class="tool-list">
+          <li>Canva</li>
+          <li>Supa</li>
+          <li>Встроенные редакторы VK / Дзена</li>
+        </ul>
+        <p style="font-size: 12px; color: var(--ink-3); margin-top: 10px;">Если оформление занимает больше времени, чем смысл — что-то пошло не туда.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. ЧЕК-ЛИСТ ПЕРЕД ПУБЛИКАЦИЕЙ -->
+  <section class="section" id="s10">
+    <div class="section-label">10 — Перед постингом</div>
+    <h2>Чек-лист перед тем, как разносить контент по площадкам</h2>
+    <p style="color: var(--ink-2); margin-bottom: 16px;">Отметьте каждый пункт — и публикуйте спокойно.</p>
+
+    <div class="pub-checklist" id="pubChecklist">
+      <div class="pub-item" onclick="togglePub(this)">
+        <div class="pub-box"></div>
+        У меня есть одна главная площадка
+      </div>
+      <div class="pub-item" onclick="togglePub(this)">
+        <div class="pub-box"></div>
+        Я не пытаюсь вести 5 соцсетей одновременно
+      </div>
+      <div class="pub-item" onclick="togglePub(this)">
+        <div class="pub-box"></div>
+        Этот контент сначала создан для приоритетной площадки
+      </div>
+      <div class="pub-item" onclick="togglePub(this)">
+        <div class="pub-box"></div>
+        Я адаптирую, а не придумываю всё с нуля для каждой площадки
+      </div>
+      <div class="pub-item" onclick="togglePub(this)">
+        <div class="pub-box"></div>
+        На дополнительной площадке формат выглядит естественно
+      </div>
+      <div class="pub-item" onclick="togglePub(this)">
+        <div class="pub-box"></div>
+        Max используется как быстрый канал связи, а не тяжёлая контентная площадка
+      </div>
+      <div class="pub-item" onclick="togglePub(this)">
+        <div class="pub-box"></div>
+        Я могу выдержать такой ритм хотя бы месяц
+      </div>
+    </div>
+    <p style="font-size: 13px; color: var(--ink-3); margin-top: 12px;">Если на последний вопрос ответ «нет» — систему нужно упростить, а не себя заставлять.</p>
+  </section>
+
+  <!-- ИТОГОВАЯ ФОРМУЛА -->
+  <div class="divider">Главное из урока</div>
+
+  <div class="formula-box">
+    <div class="formula-text">
+      <span>Одна главная площадка</span><br>
+      + один основной смысл<br>
+      + одна-две адаптации<br>
+      + несколько точек контакта с аудиторией<br><br>
+      = <span>блог, который растёт системно</span>
+    </div>
+  </div>
+
+  <!-- ЗАДАНИЯ -->
+  <div class="checklist-wrap" id="s-tasks">
+    <div class="checklist-title">Задания к уроку</div>
+    <div class="checklist-sub">Ниже задания к этому уроку. Отметьте те, которые выполнили — только для себя, мы проверять это не будем. Это ваш личный чек-лист, чтобы вы видели, что уже сделали, и могли вернуться к этому в любой момент. Каждое выполненное задание приближает вас к работающему блогу.</div>
+
+    <ul class="checklist" id="checklist">
+      <li onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div>
+          <div class="task-title">Я определила свою связку площадок</div>
+          <div class="task-meta">Основная + 1–2 дополнительные</div>
+        </div>
+      </li>
+      <li onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div>
+          <div class="task-title">Я прописала роль каждой площадки — что там буду делать</div>
+          <div class="task-meta">Основной контент / анонсы / статьи / касания</div>
+        </div>
+      </li>
+      <li onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div>
+          <div class="task-title">Я взяла один готовый пост и адаптировала его хотя бы для одной дополнительной площадки</div>
+          <div class="task-meta">Сократила / добавила заголовок / дала ссылку</div>
+        </div>
+      </li>
+      <li onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div>
+          <div class="task-title">Я составила контент-план на ближайшую неделю в таблице</div>
+          <div class="task-meta">День / тема / площадка / статус</div>
+        </div>
+      </li>
+    </ul>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Выполнено заданий</span>
+        <span id="progressText">0 / 4</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-done" id="checkProgress" style="width: 0%"></div>
+      </div>
+      <div class="progress-note">Урок считается пройденным при выполнении любого одного задания. Но чем больше сделаете — тем быстрее система начнёт работать.</div>
+    </div>
+  </div>
+
+  <!-- ИТОГ -->
+  <div class="callout-dark" id="callout">
+    <h3>Запомните одно</h3>
+    <p>Кроссплатформенный постинг — это не про то, чтобы быть везде. Это про то, чтобы один смысл работал на нескольких площадках. Выберите одну главную, добавьте 1–2 дополнительные — и адаптируйте, а не придумывайте заново. Так блог растёт системно, а вы не превращаетесь в человека, который хотел развивать личный бренд, а случайно открыл медиахолдинг.</p>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Наверх</button>
+    <button class="btn btn-ghost" onclick="window.print()">Распечатать гайд</button>
+  </div>
+
+</div>
+
+<script>
+// Прогресс скролла
+window.addEventListener('scroll', () => {
+  const el = document.getElementById('progressFill');
+  const total = document.body.scrollHeight - window.innerHeight;
+  el.style.width = (window.scrollY / total * 100) + '%';
+});
+
+// Появление секций
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.section, .callout-dark').forEach(s => observer.observe(s));
+
+// Связки
+function toggleBundle(el) {
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.bundle').forEach(b => b.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+}
+
+// Дни недели
+function toggleDay(el) {
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.day').forEach(d => d.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+}
+
+// Адаптация — табы
+function switchAdapt(btn, id) {
+  document.querySelectorAll('.adapt-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.adapt-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('adapt-' + id).classList.add('active');
+}
+
+// Чеклист публикации
+function togglePub(el) { el.classList.toggle('checked'); }
+
+// Чеклист заданий
+function toggleCheck(li) {
+  li.classList.toggle('done');
+  const items = document.querySelectorAll('#checklist li');
+  const done = document.querySelectorAll('#checklist li.done').length;
+  document.getElementById('progressText').textContent = done + ' / ' + items.length;
+  document.getElementById('checkProgress').style.width = (done / items.length * 100) + '%';
+}
+</script>
+</body>
+</html>
