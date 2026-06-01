@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Урок 3.2 — Что важно в блоге: учимся понимать аналитику</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:            #FFFFFF;
+    --bg-soft:       #F5F6F7;
+    --bg-muted:      #EDEEF0;
+    --ink:           #1A1A1A;
+    --ink-2:         #4A4D52;
+    --ink-3:         #8A8E94;
+    --line:          #E4E6E9;
+    --accent:        #C4F542;
+    --accent-strong: #B8E83D;
+    --accent-ink:    #0F1A00;
+    --font-display: 'Unbounded', ui-sans-serif, system-ui, sans-serif;
+    --font-body:    'Manrope', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-pill: 999px;
+    --shadow-sm: 0 1px 2px rgba(16,18,20,.04), 0 1px 1px rgba(16,18,20,.03);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--bg);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 740px; margin: 0 auto; padding: 56px 32px 100px; }
+
+  /* ——— Шапка ——— */
+  .lesson-header { margin-bottom: 48px; }
+  .breadcrumb {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-3);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .breadcrumb span { color: var(--line); }
+
+  .title-block {
+    display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start;
+    margin-bottom: 20px;
+  }
+  .stamp {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 8px 14px;
+    background: var(--accent); color: var(--accent-ink);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-top: 10px; white-space: nowrap;
+  }
+  .lesson-title {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: clamp(24px, 4vw, 36px); line-height: 1.1; letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    font-size: 13px; font-weight: 500; color: var(--ink-2);
+  }
+  .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3); }
+  .chip-dot-accent { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .lead-text {
+    font-family: var(--font-body); font-weight: 500;
+    font-size: 18px; line-height: 1.6; color: var(--ink);
+    margin: 24px 0 0; padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ——— Секции ——— */
+  .section { margin-top: 48px; }
+  .section-eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px;
+  }
+  .section-title {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: 22px; line-height: 1.2; letter-spacing: -0.01em; margin: 0 0 20px;
+  }
+
+  /* ——— Тело текста ——— */
+  .body-text { font-size: 16px; line-height: 1.7; color: var(--ink); margin: 0 0 16px; }
+
+  .highlight {
+    background: var(--accent); color: var(--accent-ink);
+    padding: 2px 7px; border-radius: 5px; font-weight: 600;
+  }
+  .highlight-line {
+    display: inline;
+    background-image: linear-gradient(transparent 55%, var(--accent) 55%, var(--accent) 92%, transparent 92%);
+    padding: 0 2px; font-weight: 600;
+  }
+  .marker-dot {
+    display: inline-flex; align-items: center; gap: 10px; font-weight: 600;
+  }
+  .marker-dot::before {
+    content: ''; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 0 3px rgba(196,245,66,.25);
+    flex-shrink: 0;
+  }
+
+  /* ——— Ключевой тезис ——— */
+  .key-point {
+    display: flex; gap: 16px;
+    background: var(--bg-soft); border-radius: var(--radius-md);
+    padding: 20px 24px; border-left: 3px solid var(--accent); margin: 24px 0;
+  }
+  .key-point-label {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-3);
+    white-space: nowrap; padding-top: 3px; flex-shrink: 0;
+  }
+  .key-point p { margin: 0; font-weight: 500; font-size: 15px; line-height: 1.6; }
+
+  /* ——— Цитата ——— */
+  .quote-block {
+    font-family: var(--font-display); font-weight: 400;
+    font-size: 20px; line-height: 1.45; letter-spacing: -0.01em;
+    border-left: 2px solid var(--ink); padding: 4px 0 4px 20px; margin: 28px 0;
+  }
+  .quote-author {
+    display: block; margin-top: 10px;
+    font-family: var(--font-body); font-size: 13px; font-weight: 500;
+    color: var(--ink-3); letter-spacing: 0.02em;
+  }
+
+  /* ——— Карточка ——— */
+  .card {
+    background: var(--bg); border: 1px solid var(--line);
+    border-radius: var(--radius-lg); padding: 28px;
+    box-shadow: var(--shadow-sm); margin: 20px 0;
+  }
+  .card-label {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-3); margin-bottom: 18px;
+  }
+
+  /* ——— Три метрики — большие блоки ——— */
+  .metrics-grid { display: grid; gap: 12px; margin-top: 20px; }
+  .metric-card {
+    border: 1px solid var(--line); border-radius: var(--radius-lg);
+    overflow: hidden; background: var(--bg);
+  }
+  .metric-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 24px 16px; border-bottom: 1px solid var(--line);
+  }
+  .metric-num {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    background: var(--accent); color: var(--accent-ink);
+    padding: 4px 9px; border-radius: 6px; flex-shrink: 0;
+  }
+  .metric-name {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 18px; letter-spacing: -0.01em;
+  }
+  .metric-body { padding: 18px 24px; }
+  .metric-desc { font-size: 15px; line-height: 1.65; color: var(--ink-2); margin: 0 0 14px; }
+  .metric-norms { display: grid; gap: 8px; }
+  .norm-row {
+    display: flex; align-items: baseline; gap: 10px;
+    padding: 10px 14px; background: var(--bg-soft); border-radius: var(--radius-sm);
+  }
+  .norm-label { font-size: 13px; color: var(--ink-3); flex-shrink: 0; min-width: 160px; }
+  .norm-value { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--ink); }
+
+  /* ——— Игнорировать ——— */
+  .ignore-block {
+    background: var(--bg-muted); border-radius: var(--radius-md);
+    padding: 18px 22px; margin-top: 16px; display: flex; gap: 16px; align-items: flex-start;
+  }
+  .ignore-icon {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--ink-3);
+    text-transform: uppercase; letter-spacing: 0.06em; flex-shrink: 0; padding-top: 2px;
+  }
+  .ignore-text { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+
+  /* ——— Два типа блогеров ——— */
+  .types-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+  .type-card {
+    border: 1px solid var(--line); border-radius: var(--radius-md); padding: 20px;
+  }
+  .type-tag {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-3); margin-bottom: 8px;
+  }
+  .type-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .type-desc { font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+  .type-result {
+    margin-top: 12px; padding: 8px 12px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+  }
+  .type-result-bad { background: #FEE2E2; color: #991B1B; }
+  .type-result-ok { background: var(--bg-muted); color: var(--ink-2); }
+
+  /* ——— Динамика роста ——— */
+  .dynamics-list { display: grid; gap: 10px; margin: 16px 0; }
+  .dyn-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius-md);
+  }
+  .dyn-badge {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 6px; flex-shrink: 0; white-space: nowrap;
+  }
+  .dyn-badge-up { background: var(--accent); color: var(--accent-ink); }
+  .dyn-badge-flat { background: var(--bg-muted); color: var(--ink-3); }
+  .dyn-badge-down { background: #FEF3C7; color: #92400E; }
+  .dyn-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .dyn-desc { font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+
+  /* ——— Причины спада ——— */
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+  .steps li {
+    counter-increment: step;
+    display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start;
+    padding: 18px 0; border-bottom: 1px solid var(--line);
+  }
+  .steps li:last-child { border-bottom: none; }
+  .steps li::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+    color: var(--ink-3); padding-top: 2px;
+  }
+  .step-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+
+  /* ——— Где искать аналитику ——— */
+  .platforms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+  .platform-item {
+    padding: 14px 16px; background: var(--bg-soft);
+    border: 1px solid var(--line); border-radius: var(--radius-md);
+  }
+  .platform-name { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .platform-path { font-family: var(--font-mono); font-size: 12px; color: var(--ink-3); line-height: 1.5; }
+
+  /* ——— Тёмный колл-аут ——— */
+  .callout-dark {
+    background: var(--ink); color: #fff;
+    border-radius: var(--radius-lg); padding: 28px 32px; margin: 24px 0;
+  }
+  .callout-dark h3 {
+    font-family: var(--font-display); font-weight: 500; font-size: 20px; margin: 0 0 10px;
+  }
+  .callout-dark p { margin: 0 0 8px; color: #CFD1D4; font-size: 15px; line-height: 1.6; }
+  .callout-dark p:last-child { margin-bottom: 0; }
+
+  /* ——— Разделитель ——— */
+  .divider {
+    display: flex; align-items: center; gap: 16px;
+    margin: 40px 0; color: var(--ink-3);
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+  /* ——— Точка А ——— */
+  .point-a-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+  .point-a-item {
+    border: 1px dashed #C4C7CC; border-radius: var(--radius-md);
+    padding: 18px 16px; text-align: center; background: var(--bg-soft);
+  }
+  .point-a-label {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px;
+  }
+  .point-a-field {
+    background-image: repeating-linear-gradient(
+      transparent, transparent 27px, var(--line) 27px, var(--line) 28px
+    );
+    height: 56px;
+  }
+
+  /* ——— Итоги ——— */
+  .outcomes { display: grid; gap: 10px; margin-top: 16px; }
+  .outcome-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 18px; background: var(--bg-soft); border-radius: var(--radius-md);
+  }
+  .outcome-check {
+    width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    background: var(--accent); position: relative; margin-top: 1px;
+  }
+  .outcome-check::after {
+    content: ''; position: absolute; left: 7px; top: 3px;
+    width: 6px; height: 10px;
+    border-right: 2px solid var(--accent-ink);
+    border-bottom: 2px solid var(--accent-ink); transform: rotate(45deg);
+  }
+  .outcome-text { font-weight: 600; font-size: 15px; line-height: 1.5; }
+
+  /* ——— Домашнее задание ——— */
+  .hw-block {
+    background: var(--ink); color: #fff;
+    border-radius: var(--radius-lg); padding: 32px; margin-top: 40px;
+  }
+  .hw-eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+  }
+  .hw-block h3 {
+    font-family: var(--font-display); font-weight: 500; font-size: 22px; margin: 0 0 20px;
+  }
+  .hw-items { display: grid; gap: 12px; }
+  .hw-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: rgba(255,255,255,0.06); border-radius: var(--radius-md); padding: 16px 18px;
+  }
+  .hw-num {
+    background: var(--accent); color: var(--accent-ink);
+    font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    padding: 3px 9px; border-radius: 5px; flex-shrink: 0; margin-top: 1px;
+  }
+  .hw-text { color: #E8EAED; font-size: 15px; line-height: 1.6; font-weight: 500; }
+
+  /* ——— Навигация ——— */
+  .nav-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--line); gap: 12px;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-body); font-weight: 600; font-size: 15px;
+    padding: 14px 24px; border-radius: var(--radius-pill);
+    border: 1px solid transparent; cursor: pointer; text-decoration: none;
+    transition: background .15s, transform .08s;
+  }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+  .btn-ghost:hover { background: var(--bg-soft); }
+
+  @media (max-width: 640px) {
+    .page { padding: 36px 20px 72px; }
+    .title-block { grid-template-columns: 1fr; gap: 10px; }
+    .stamp { justify-self: start; margin-top: 0; }
+    .types-grid, .platforms-grid, .point-a-grid { grid-template-columns: 1fr; }
+    .nav-row { flex-direction: column; align-items: stretch; }
+    .nav-row .btn { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ——— Шапка ——— -->
+  <header class="lesson-header">
+    <div class="breadcrumb">
+      Блогер с нуля 2026
+      <span>·</span>
+      Неделя 3
+      <span>·</span>
+      Модуль 3 — Работаем с блогом как с системой
+    </div>
+
+    <div class="title-block">
+      <span class="stamp">Урок 3.2</span>
+      <h1 class="lesson-title">Что важно в блоге: учимся понимать аналитику</h1>
+    </div>
+
+    <div class="meta-row">
+      <span class="chip"><span class="chip-dot"></span> 20 минут чтения</span>
+      <span class="chip"><span class="chip-dot"></span> Спикер: Историчка</span>
+      <span class="chip"><span class="chip-dot-accent"></span> Аналитика</span>
+    </div>
+
+    <p class="lead-text">Как смотреть на цифры без паники. Три метрики, которые реально важны. Что такое нормальная динамика. И почему прямо сейчас нужно зафиксировать свою точку А.</p>
+  </header>
+
+  <!-- ——— 01 · Два типа блогеров ——— -->
+  <section class="section">
+    <div class="section-eyebrow">01 · Контекст</div>
+    <h2 class="section-title">Две крайности, которые не работают</h2>
+
+    <div class="types-grid">
+      <div class="type-card">
+        <div class="type-tag">Тип 1</div>
+        <div class="type-title">Параноик цифр</div>
+        <div class="type-desc">Заходит в статистику каждые два часа. Охват упал — паника, удаляет пост, публикует новый. По кругу.</div>
+        <div class="type-result type-result-bad">Через месяц — выгорание</div>
+      </div>
+      <div class="type-card">
+        <div class="type-tag">Тип 2</div>
+        <div class="type-title">Не смотрит вообще</div>
+        <div class="type-desc">Публикует по ощущениям, не понимает что работает, топчется на месте.</div>
+        <div class="type-result type-result-ok">Рост не идёт</div>
+      </div>
+    </div>
+
+    <div class="key-point">
+      <div class="key-point-label">Третий путь</div>
+      <p>Смотреть на <span class="highlight">нужные цифры</span> в нужное время с нужным отношением. Без паники — именно это разберём сегодня.</p>
+    </div>
+  </section>
+
+  <div class="divider">Три метрики</div>
+
+  <!-- ——— 02 · Метрики ——— -->
+  <section class="section" style="margin-top: 0;">
+    <div class="section-eyebrow">02 · Главное</div>
+    <h2 class="section-title">Три числа, на которые смотреть каждую неделю</h2>
+
+    <p class="body-text">Подписчики — это витрина. <span class="highlight-line">Охват и вовлечённость — это реальность.</span> Именно по ним рекламодатели решают, работать с вами или нет. Именно на них смотрит алгоритм, когда решает, показывать ваш контент дальше или нет.</p>
+
+    <div class="metrics-grid">
+
+      <!-- Охват -->
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-num">01</span>
+          <div class="metric-name">Охват</div>
+        </div>
+        <div class="metric-body">
+          <p class="metric-desc">Сколько уникальных людей увидели пост. Важнее лайков — пост может набрать мало реакций, но большой охват означает, что алгоритм показывает его новым людям.</p>
+          <div class="metric-norms">
+            <div class="norm-row">
+              <span class="norm-label">До 1 000 подписчиков</span>
+              <span class="norm-value">20–50% от базы</span>
+            </div>
+            <div class="norm-row">
+              <span class="norm-label">1 000 — 10 000</span>
+              <span class="norm-value">15–30%</span>
+            </div>
+            <div class="norm-row">
+              <span class="norm-label">Telegram</span>
+              <span class="norm-value">20–40% просмотров</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Вовлечённость -->
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-num">02</span>
+          <div class="metric-name">Вовлечённость (ER)</div>
+        </div>
+        <div class="metric-body">
+          <p class="metric-desc">Лайки + комментарии + сохранения + репосты ÷ охват × 100%. Считать вручную не нужно — метрика уже есть в статистике платформы.</p>
+          <div class="metric-norms">
+            <div class="norm-row">
+              <span class="norm-label">До 1 000 подписчиков</span>
+              <span class="norm-value">15%+ — хорошо</span>
+            </div>
+            <div class="norm-row">
+              <span class="norm-label">1 000 — 10 000</span>
+              <span class="norm-value">8–12%</span>
+            </div>
+            <div class="norm-row">
+              <span class="norm-label">Тревожный сигнал</span>
+              <span class="norm-value">ниже 5%</span>
+            </div>
+            <div class="norm-row">
+              <span class="norm-label">Дзен / Рутюб</span>
+              <span class="norm-value">дочитываемость 40%+</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Сохранения -->
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-num">03</span>
+          <div class="metric-name">Сохранения</div>
+        </div>
+        <div class="metric-body">
+          <p class="metric-desc">Особенно ценный показатель, который многие игнорируют. Человек сохраняет то, к чему хочет вернуться. Это сигнал алгоритму: контент полезный — показывай больше.</p>
+          <div class="metric-norms">
+            <div class="norm-row">
+              <span class="norm-label">Пост с 10 сохранениями</span>
+              <span class="norm-value">часто лучше 100 лайков</span>
+            </div>
+            <div class="norm-row">
+              <span class="norm-label">Видео: удержание</span>
+              <span class="norm-value">50%+ = отличный результат</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="ignore-block">
+      <span class="ignore-icon">Игнор</span>
+      <p class="ignore-text">Общее число подписчиков без динамики, лайки без контекста охватов. Сами по себе эти цифры ничего не говорят о здоровье блога.</p>
+    </div>
+  </section>
+
+  <div class="divider">Динамика</div>
+
+  <!-- ——— 03 · Нормальная динамика ——— -->
+  <section class="section" style="margin-top: 0;">
+    <div class="section-eyebrow">03 · Психология роста</div>
+    <h2 class="section-title">Нормальная динамика блога</h2>
+
+    <blockquote class="quote-block">
+      Блог — это не лифт, который едет вверх без остановки. Это лестница с перепадами и площадками.
+      <span class="quote-author">— Историчка, спикер курса</span>
+    </blockquote>
+
+    <div class="dynamics-list">
+      <div class="dyn-item">
+        <span class="dyn-badge dyn-badge-up">Всплеск</span>
+        <div>
+          <div class="dyn-title">Пост залетел в рекомендации</div>
+          <div class="dyn-desc">Пришли новые подписчики, охваты выросли. Это хорошо, но так будет не всегда. После всплеска почти всегда идёт откат — это тоже абсолютно нормально.</div>
+        </div>
+      </div>
+      <div class="dyn-item">
+        <span class="dyn-badge dyn-badge-flat">Стагнация</span>
+        <div>
+          <div class="dyn-title">Несколько недель цифры почти не меняются</div>
+          <div class="dyn-desc">Охват плюс-минус одинаковый, прирост минимальный. Бывает у всех — и с 1 000 подписчиков, и с миллионом. Это сигнал попробовать новый формат или тему.</div>
+        </div>
+      </div>
+      <div class="dyn-item">
+        <span class="dyn-badge dyn-badge-down">Спад охватов</span>
+        <div>
+          <div class="dyn-title">Делаете то же самое, а цифры падают</div>
+          <div class="dyn-desc">Самый пугающий момент. Главное правило: не делать резких движений. Подождать 2–3 недели, смотреть на динамику, и только потом делать выводы.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ——— 04 · Причины спада ——— -->
+  <section class="section">
+    <div class="section-eyebrow">04 · Разбор</div>
+    <h2 class="section-title">Четыре причины спада охватов</h2>
+
+    <div class="card">
+      <div class="card-label">Что происходит и как реагировать</div>
+      <ol class="steps">
+        <li>
+          <div>
+            <div class="step-title">Обновился алгоритм</div>
+            <div class="step-desc">Случается регулярно на всех платформах. Не вы сделали что-то не так — платформа изменила правила. Продолжайте публиковать, не меняйте контент сразу, наблюдайте.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Аудитория насытилась форматом</div>
+            <div class="step-desc">Вы долго делали одно и то же, люди привыкли и перестали реагировать. Добавьте новый формат — не убирая старый.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Вы сами выгораете</div>
+            <div class="step-desc">Это видно в контенте: посты становятся реже, короче, тема менее живой. Нужно вернуться к своему «зачем» из первого урока и разрешить себе замедлиться без полной остановки.</div>
+          </div>
+        </li>
+        <li>
+          <div>
+            <div class="step-title">Внешние факторы</div>
+            <div class="step-desc">Лето, праздники, новостной фон — люди меньше сидят в соцсетях или сидят иначе. В новогодние праздники часто идут отписки: люди избавляются от старого. Это пройдёт само.</div>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="key-point">
+      <div class="key-point-label">Правило</div>
+      <p>При спаде — не удалять посты, не менять нишу, не уходить с платформы. Подождите <span class="highlight">2–3 недели</span>, смотрите на динамику, выводы делайте потом.</p>
+    </div>
+  </section>
+
+  <div class="divider">Расписание</div>
+
+  <!-- ——— 05 · Как часто смотреть ——— -->
+  <section class="section" style="margin-top: 0;">
+    <div class="section-eyebrow">05 · Режим</div>
+    <h2 class="section-title">Как часто смотреть аналитику</h2>
+
+    <p class="body-text">Частота просмотра цифр напрямую влияет на психологическое состояние. Если после статистики начинается тревога — введите правило.</p>
+
+    <div class="callout-dark">
+      <h3>Ритм работы с цифрами</h3>
+      <p><strong style="color: #fff;">Раз в неделю — 5 минут.</strong> Например, каждое воскресенье вечером: охваты за неделю, вовлечённость последних постов, прирост подписчиков. Всё, закрываем.</p>
+      <p><strong style="color: #fff;">Раз в месяц — глубокий разбор.</strong> Какие 3 поста набрали больше охвата и что у них общего — тема, формат, время. Что провалилось — убираем или корректируем.</p>
+      <p>Публикация может набирать охват несколько дней — особенно ВКонтакте и MAX. Алгоритмы показывают контент 2–3 дня после выхода. Выводы по первому дню — ошибка.</p>
+    </div>
+  </section>
+
+  <div class="divider">Где искать</div>
+
+  <!-- ——— 06 · Платформы ——— -->
+  <section class="section" style="margin-top: 0;">
+    <div class="section-eyebrow">06 · Навигация</div>
+    <h2 class="section-title">Где найти аналитику на каждой платформе</h2>
+
+    <div class="platforms-grid">
+      <div class="platform-item">
+        <div class="platform-name">ВКонтакте</div>
+        <div class="platform-path">Кнопка «Управление» → Статистика. Охват, вовлечённость, данные по каждому посту.</div>
+      </div>
+      <div class="platform-item">
+        <div class="platform-name">Telegram</div>
+        <div class="platform-path">Нажмите на любой пост в канале → Статистика. Или: Настройки канала → вкладка Статистика.</div>
+      </div>
+      <div class="platform-item">
+        <div class="platform-name">MAX</div>
+        <div class="platform-path">Настройки канала → кнопка Статистика. Базовые метрики охвата и вовлечённость.</div>
+      </div>
+      <div class="platform-item">
+        <div class="platform-name">TikTok</div>
+        <div class="platform-path">Профиль → три полосочки → Creator Tools → Аналитика.</div>
+      </div>
+    </div>
+
+    <p class="body-text" style="font-size: 14px; color: var(--ink-2);">Гайды с картинками по аналитике для каждой платформы — в материалах курса.</p>
+  </section>
+
+  <div class="divider">Точка А</div>
+
+  <!-- ——— 07 · Точка А ——— -->
+  <section class="section" style="margin-top: 0;">
+    <div class="section-eyebrow">07 · Стартовый снимок</div>
+    <h2 class="section-title">Зафиксируйте точку А прямо сейчас</h2>
+
+    <p class="body-text">Сейчас, возможно, кажется, что мерить нечего. Но именно сейчас нужно зафиксировать отправную точку. Через три месяца вы откроете этот скриншот и увидите, как далеко продвинулись.</p>
+
+    <div class="point-a-grid">
+      <div class="point-a-item">
+        <div class="point-a-label">Подписчики сейчас</div>
+        <div class="point-a-field"></div>
+      </div>
+      <div class="point-a-item">
+        <div class="point-a-label">Охват последнего поста</div>
+        <div class="point-a-field"></div>
+      </div>
+      <div class="point-a-item">
+        <div class="point-a-label">Вовлечённость (ER)</div>
+        <div class="point-a-field"></div>
+      </div>
+    </div>
+
+    <div class="key-point">
+      <div class="key-point-label">Важно</div>
+      <p>Цифры не оценивают вас как человека. Они показывают, <span class="highlight-line">где вы сейчас</span> и где будете через полгода — если продолжите идти.</p>
+    </div>
+  </section>
+
+  <div class="divider">Итоги урока</div>
+
+  <!-- ——— Итоги ——— -->
+  <section class="section" style="margin-top: 0;">
+    <div class="section-eyebrow">08 · Выводы</div>
+    <h2 class="section-title">Три вещи из этого урока</h2>
+
+    <div class="outcomes">
+      <div class="outcome-item">
+        <div class="outcome-check"></div>
+        <div class="outcome-text">Три метрики: охват, вовлечённость, сохранения. Лайки — не главное.</div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-check"></div>
+        <div class="outcome-text">Всплески, стагнации, спады — нормальная жизнь блога. Не делайте резких движений. Наблюдайте 2–3 недели.</div>
+      </div>
+      <div class="outcome-item">
+        <div class="outcome-check"></div>
+        <div class="outcome-text">Аналитика раз в неделю — 5 минут. Раз в месяц — глубокий разбор.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ——— Домашнее задание ——— -->
+  <div class="hw-block">
+    <div class="hw-eyebrow">Домашнее задание</div>
+    <h3>Три действия после урока</h3>
+    <div class="hw-items">
+      <div class="hw-item">
+        <span class="hw-num">01</span>
+        <div class="hw-text">Зайти в аналитику платформы и записать точку А: подписчики, охват последнего поста, примерная вовлечённость. Сфотографировать — это стартовый скриншот.</div>
+      </div>
+      <div class="hw-item">
+        <span class="hw-num">02</span>
+        <div class="hw-text">Поставить в календарь еженедельное напоминание «5 минут на аналитику». Выбрать день и время прямо сейчас.</div>
+      </div>
+      <div class="hw-item">
+        <span class="hw-num">⭐</span>
+        <div class="hw-text">Скинуть точку А в чат курса. Через месяц сравним результаты вместе.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ——— Навигация ——— -->
+  <div class="nav-row">
+    <a href="#" class="btn btn-ghost">← Урок 3.1 · Контент-система</a>
+    <a href="#" class="btn btn-primary">Урок 3.3 · Один пост — три площадки →</a>
+  </div>
+
+</div>
+
+</body>
+</html>
